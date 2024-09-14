@@ -1,0 +1,458 @@
+﻿using System;
+using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Security.Cryptography;
+using System.Windows.Forms;
+
+namespace WinFormsApp2
+{
+    public partial class Form4 : Form
+    {
+        private RSA rsa;
+        private byte[] spritzKey;
+        private byte[] encryptedSpritzKey = Array.Empty<byte>(); // Inisialisasi dengan array kosong
+
+        public Form4()
+        {
+            InitializeComponent();
+            rsa = RSA.Create(); // Inisialisasi RSA
+            spritzKey = Array.Empty<byte>(); // Inisialisasi dengan array kosong
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            int panjangKunci = 16; // Panjang kunci dalam byte (128 bit)
+            spritzKey = GenerateSpritzKey(panjangKunci); // Menghasilkan kunci Spritz
+
+            // Konversi byte array ke format string untuk ditampilkan
+            string spritzKeyString = BitConverter.ToString(spritzKey).Replace("-", "");
+
+            textBoxSpritzKey.Text = spritzKeyString; // Tampilkan kunci Spritz di TextBox
+        }
+
+        private byte[] GenerateSpritzKey(int keyLength)
+        {
+            // Buat instance Spritz cipher
+            Spritz spritz = new Spritz();
+
+            // Generate kunci acak 128-bit untuk Spritz
+            byte[] randomKey = GenerateRandomKey();
+
+            // Set kunci pada Spritz cipher
+            spritz.SetKey(randomKey);
+
+            // Generate keystream sepanjang panjang kunci
+            return spritz.GenerateKeystream(keyLength);
+        }
+
+        private byte[] GenerateRandomKey()
+        {
+            // Menghasilkan kunci acak 128-bit (16 byte)
+            byte[] randomKey = new byte[16];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomKey);
+            }
+            return randomKey;
+        }
+
+        private void Form4_Load(object sender, EventArgs e)
+        {
+        }
+
+        /*
+        private bool IsValidMedicalImage(string filePath)
+        {
+            // Cek format file apakah JPG atau JPEG
+            string fileExtension = Path.GetExtension(filePath).ToLower();
+            if (fileExtension != ".jpg" && fileExtension != ".jpeg")
+            {
+                return false;
+            }
+
+            using (Image img = Image.FromFile(filePath))
+            {
+                // Jika gambar memiliki bit depth 24, maka ini adalah gambar RGB
+                if (img.PixelFormat == PixelFormat.Format24bppRgb)
+                {
+                    // Konversi gambar RGB ke grayscale
+                    Bitmap grayImage = ConvertToGrayscale(img);
+
+                    // Lakukan validasi grayscale
+                    if (grayImage.PixelFormat != PixelFormat.Format8bppIndexed)
+                    {
+                        return false;
+                    }
+
+                    // Jika valid, gambar dapat dikonversi dan dianggap valid
+                    return true;
+                }
+                else if (img.PixelFormat == PixelFormat.Format8bppIndexed)
+                {
+                    // Jika gambar sudah dalam format grayscale 8-bit
+                    return true;
+                }
+                else
+                {
+                    // Jika bukan grayscale atau RGB, gambar tidak valid
+                    return false;
+                }
+            }
+        }
+
+        private Bitmap ConvertToGrayscale(Image originalImage)
+        {
+            // Membuat Bitmap baru untuk menyimpan citra grayscale
+            Bitmap grayscaleImage = new Bitmap(originalImage.Width, originalImage.Height);
+
+            // Menggunakan Graphics untuk menggambar ulang gambar dalam skala abu-abu
+            using (Graphics g = Graphics.FromImage(grayscaleImage))
+            {
+                // Menggunakan ColorMatrix untuk konversi ke grayscale
+                ColorMatrix colorMatrix = new ColorMatrix(new float[][]
+                {
+                    new float[] { 0.3f, 0.3f, 0.3f, 0, 0 },
+                    new float[] { 0.59f, 0.59f, 0.59f, 0, 0 },
+                    new float[] { 0.11f, 0.11f, 0.11f, 0, 0 },
+                    new float[] { 0, 0, 0, 1, 0 },
+                    new float[] { 0, 0, 0, 0, 1 }
+                });
+
+                ImageAttributes attributes = new ImageAttributes();
+                attributes.SetColorMatrix(colorMatrix);
+
+                g.DrawImage(originalImage, new Rectangle(0, 0, originalImage.Width, originalImage.Height),
+                            0, 0, originalImage.Width, originalImage.Height, GraphicsUnit.Pixel, attributes);
+            }
+
+            return grayscaleImage;
+        }
+        */
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Citra Medis",
+                Filter = "File Gambar (*.jpg, *.jpeg, *.png, *.tiff) | *.jpg; *.jpeg; *.png; *.tiff",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string filePath = openFileDialog.FileName;
+
+                // Coba tampilkan gambar di PictureBox langsung, tanpa validasi bit depth
+                try
+                {
+                    // Tampilkan gambar di PictureBox
+                    pictureBoxSelectedImage.Image = Image.FromFile(filePath);
+                    pictureBoxSelectedImage.SizeMode = PictureBoxSizeMode.Zoom;
+
+                    // Tampilkan path gambar di TextBox
+                    textBoxImagePath.Text = filePath;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Gagal menampilkan gambar: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (spritzKey == null || spritzKey.Length == 0)
+            {
+                MessageBox.Show("Harap generate kunci Spritz terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Kunci Spritz",
+                Filter = "Binary Files (*.bin)|*.bin",
+                FileName = "spritz_key.bin"
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    File.WriteAllBytes(saveFileDialog.FileName, spritzKey);
+                    MessageBox.Show("Kunci Spritz berhasil disimpan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Gagal menyimpan kunci Spritz: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (spritzKey == null || spritzKey.Length == 0)
+            {
+                MessageBox.Show("Harap generate kunci Spritz terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string imagePath = textBoxImagePath.Text;
+
+            if (string.IsNullOrEmpty(imagePath))
+            {
+                MessageBox.Show("Harap pilih gambar terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Menggunakan Stopwatch untuk mengukur waktu enkripsi
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start(); // Mulai mengukur waktu
+
+            EncryptImage(imagePath, spritzKey);
+
+            stopwatch.Stop(); // Hentikan pengukuran waktu
+            double elapsedTimeInSeconds = stopwatch.Elapsed.TotalSeconds; // Mengambil waktu dalam detik
+
+            labelEncryptionTime.Text = $"Waktu Enkripsi: {elapsedTimeInSeconds} detik";
+        }
+
+        private byte[] EncryptData(byte[] data, byte[] spritzKey)
+        {
+            byte[] encryptedData = new byte[data.Length];
+            for (int i = 0; i < data.Length; i++)
+            {
+                encryptedData[i] = (byte)(data[i] ^ spritzKey[i % spritzKey.Length]);
+            }
+            return encryptedData;
+        }
+
+        private void EncryptImage(string imagePath, byte[] spritzKey)
+        {
+            try
+            {
+                using (Bitmap img = new Bitmap(imagePath))
+                {
+                    int width = img.Width;
+                    int height = img.Height;
+                    byte[] imageData = new byte[width * height];
+                    byte[] encryptedImageData = new byte[width * height];
+
+                    // Inisialisasi progress bar
+                    progressBarEncryption.Minimum = 0;
+                    progressBarEncryption.Maximum = height * width;
+                    progressBarEncryption.Value = 0;
+
+                    // Membaca data gambar
+                    for (int y = 0; y < height; y++)
+                    {
+                        for (int x = 0; x < width; x++)
+                        {
+                            Color pixelColor = img.GetPixel(x, y);
+                            imageData[y * width + x] = pixelColor.R; // Gambar grayscale jadi hanya R yang diambil
+                        }
+                    }
+
+                    // Mengenkripsi data gambar
+                    byte[] keystream = GenerateKeystream(width * height);
+                    for (int i = 0; i < imageData.Length; i++)
+                    {
+                        encryptedImageData[i] = (byte)(imageData[i] ^ keystream[i]);
+                        progressBarEncryption.Value = i + 1; // Update progress bar
+                    }
+
+                    // Simpan gambar terenkripsi
+                    Bitmap encryptedImg = new Bitmap(width, height);
+                    for (int y = 0; y < height; y++)
+                    {
+                        for (int x = 0; x < width; x++)
+                        {
+                            byte pixelValue = encryptedImageData[y * width + x];
+                            encryptedImg.SetPixel(x, y, Color.FromArgb(pixelValue, pixelValue, pixelValue));
+                        }
+                    }
+
+                    // Tampilkan gambar terenkripsi di PictureBox
+                    pictureBoxEncrypted.Image = encryptedImg;
+                    pictureBoxEncrypted.SizeMode = PictureBoxSizeMode.StretchImage;
+
+                    MessageBox.Show("Gambar berhasil dienkripsi. Silakan simpan gambar terenkripsi menggunakan tombol 'Save Cipher Image'.",
+                                "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Gagal mengenkripsi gambar: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private byte[] GenerateKeystream(int length)
+        {
+            Spritz spritz = new Spritz();
+            spritz.SetKey(spritzKey);
+            return spritz.GenerateKeystream(length);
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            if (pictureBoxEncrypted.Image == null)
+            {
+                MessageBox.Show("Tidak ada gambar terenkripsi untuk disimpan.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Citra Medis Encrypted",
+                Filter = "Bitmap Image (*.bmp)|*.bmp",
+                FilterIndex = 1,
+                RestoreDirectory = true,
+                FileName = "encrypt_image.bmp" // Nama default file
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    string filePath = saveFileDialog.FileName;
+                    pictureBoxEncrypted.Image.Save(filePath);
+                    MessageBox.Show($"Gambar berhasil disimpan sebagai {filePath}.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Gagal menyimpan gambar: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void button10_Click_1(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        // Load RSA Public Key
+        private void buttonRsaPublicKey_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Kunci RSA",
+                Filter = "PEM Files (*.pem)|*.pem",
+                Title = "Pilih Kunci Publik RSA"
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string publicKeyPath = openFileDialog.FileName;
+                string rsaPublicKeyPem = File.ReadAllText(publicKeyPath);
+
+                try
+                {
+                    // Konversi PEM ke format byte[]
+                    byte[] rsaPublicKeyBytes = ConvertPemToBytes(rsaPublicKeyPem);
+
+                    // Mengimpor kunci publik dengan format X.509
+                    rsa.ImportSubjectPublicKeyInfo(rsaPublicKeyBytes, out _);
+                    textBoxRsaPublicKey.Text = rsaPublicKeyPem; // Tampilkan di TextBox
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Gagal memuat kunci publik RSA: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        // Mengonversi PEM ke Format Byte[]
+        private byte[] ConvertPemToBytes(string pem)
+        {
+            var pemHeader = "-----BEGIN PUBLIC KEY-----";
+            var pemFooter = "-----END PUBLIC KEY-----";
+
+            var base64 = pem.Replace(pemHeader, "").Replace(pemFooter, "").Replace("\r", "").Replace("\n", "");
+            return Convert.FromBase64String(base64);
+        }
+
+        private void buttonLoadSpritzKey_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Kunci Spritz",
+                Filter = "Binary Files (*.bin)|*.bin",
+                Title = "Select Spritz Key"
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string spritzKeyPath = openFileDialog.FileName;
+                spritzKey = File.ReadAllBytes(spritzKeyPath);
+                textBoxSpritzKey2.Text = BitConverter.ToString(spritzKey).Replace("-", "");
+            }
+        }
+
+        private void buttonEncryptSpritzKey_Click(object sender, EventArgs e)
+        {
+            if (rsa == null || spritzKey == null)
+            {
+                MessageBox.Show("Silakan muat baik kunci publik RSA maupun kunci Spritz.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Menggunakan Stopwatch untuk mengukur waktu enkripsi
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start(); // Mulai mengukur waktu
+
+            try
+            {
+                encryptedSpritzKey = rsa.Encrypt(spritzKey, RSAEncryptionPadding.Pkcs1); // Enkripsi kunci Spritz
+
+                stopwatch.Stop(); // Hentikan pengukuran waktu
+                double elapsedTimeInSeconds = stopwatch.Elapsed.TotalSeconds; // Mengambil waktu dalam detik
+                labelEncryptionTime2.Text = $"Waktu Enkripsi: {elapsedTimeInSeconds} detik";
+
+                // Simulasi pembaruan progress bar
+                progressBarEncryption2.Value = 100;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Gagal mengenkripsi kunci Spritz: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+        }
+
+        private void buttonSaveCipherKey_Click(object sender, EventArgs e)
+        {
+            if (encryptedSpritzKey == null)
+            {
+                MessageBox.Show("Tidak ada kunci Spritz yang dienkripsi untuk disimpan.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Kunci Spritz Encrypted",
+                Filter = "Binary Files (*.bin)|*.bin",
+                Title = "Simpan Kunci Spritz yang Dienkripsi",
+                FileName = "encrypted_spritz_key.bin"
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    File.WriteAllBytes(saveFileDialog.FileName, encryptedSpritzKey);
+                    MessageBox.Show("Kunci Spritz yang dienkripsi berhasil disimpan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Gagal menyimpan kunci Spritz yang dienkripsi: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
