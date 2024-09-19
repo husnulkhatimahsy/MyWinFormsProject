@@ -316,8 +316,15 @@ namespace WinFormsApp2
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string spritzKeyPath = openFileDialog.FileName;
-                spritzKey = File.ReadAllBytes(spritzKeyPath);
-                textBoxSpritzKey2.Text = BitConverter.ToString(spritzKey).Replace("-", "");
+                try
+                {
+                    byte[] spritzKey = File.ReadAllBytes(spritzKeyPath);
+                    textBoxSpritzKey2.Text = BitConverter.ToString(spritzKey).Replace("-", "");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error reading file: " + ex.Message);
+                }
             }
         }
 

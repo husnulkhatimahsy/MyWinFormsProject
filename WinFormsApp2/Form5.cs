@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using WinFormsApp2;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WinFormsApp2
 {
@@ -41,196 +35,6 @@ namespace WinFormsApp2
 
         }
 
-        private void button8_Click(object sender, EventArgs e)
-        {
-            // Tentukan PictureBox yang akan disimpan
-            PictureBox pictureBoxToSave = pictureBoxPlainImage; // Atur sesuai dengan PictureBox yang diinginkan
-
-            // Tentukan format file dan filter dialog
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Citra Medis Decrypted",
-                Filter = "JPEG Image (*.jpg;*.jpeg)|*.jpg;*.jpeg",
-                Title = "Simpan Gambar Hasil Dekripsi",
-                FileName = "plain_image_decrypted.jpg" // Nama default file
-            };
-
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    // Simpan gambar dari PictureBox ke file dalam format JPEG
-                    pictureBoxToSave.Image.Save(saveFileDialog.FileName, System.Drawing.Imaging.ImageFormat.Jpeg);
-                    MessageBox.Show("Gambar berhasil disimpan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Gagal menyimpan gambar: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void buttonChooseImage_Click_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Citra Medis Encrypted",
-                Filter = "File Gambar (*.bmp) | *.bmp",
-                FilterIndex = 1,
-                RestoreDirectory = true
-            };
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                string filePath = openFileDialog.FileName;
-                textBoxCipherImagePath.Text = filePath;
-                pictureBoxCipherImage.Image = Image.FromFile(filePath);
-                pictureBoxCipherImage.SizeMode = PictureBoxSizeMode.StretchImage;
-            }
-        }
-
-        private void textBoxCipherImagePath_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void Form5_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void buttonUploadKey_Click_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Kunci Spritz Decrypted",
-                Filter = "Binary Files (*.bin)|*.bin",
-                Title = "Select Spritz Key File"
-            };
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    spritzKey = File.ReadAllBytes(openFileDialog.FileName);
-                    // Tampilkan kunci di TextBox atau lakukan sesuatu dengan kunci
-                    textBoxSpritzKey.Text = BitConverter.ToString(spritzKey).Replace("-", "");
-                    MessageBox.Show("Kunci Spritz berhasil dimuat.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Gagal memuat kunci Spritz: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void buttonDecrypt_Click(object sender, EventArgs e)
-        {
-            if (spritzKey == null || spritzKey.Length == 0)
-            {
-                MessageBox.Show("Harap muat kunci Spritz terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (string.IsNullOrEmpty(textBoxCipherImagePath.Text))
-            {
-                MessageBox.Show("Harap pilih gambar terenkripsi terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            string cipherImagePath = textBoxCipherImagePath.Text;
-
-            // Menggunakan Stopwatch untuk mengukur waktu dekripsi
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start(); // Mulai mengukur waktu
-
-            // Dekripsi gambar
-            DecryptImage(cipherImagePath, spritzKey);
-
-            stopwatch.Stop(); // Hentikan pengukuran waktu
-            double elapsedTimeInSeconds = stopwatch.Elapsed.TotalSeconds; // Mengambil waktu dalam detik
-
-            labelDecryptionTime.Text = $"Waktu Dekripsi: {elapsedTimeInSeconds} detik";
-
-        }
-
-        private void DecryptImage(string imagePath, byte[] spritzKey)
-        {
-            try
-            {
-                using (Bitmap encryptedImg = new Bitmap(imagePath))
-                {
-                    int width = encryptedImg.Width;
-                    int height = encryptedImg.Height;
-                    byte[] encryptedImageData = new byte[width * height];
-                    byte[] decryptedImageData = new byte[width * height];
-
-                    // Inisialisasi progress bar
-                    progressBarDecryption.Minimum = 0;
-                    progressBarDecryption.Maximum = height * width;
-                    progressBarDecryption.Value = 0;
-
-                    // Membaca data gambar terenkripsi
-                    for (int y = 0; y < height; y++)
-                    {
-                        for (int x = 0; x < width; x++)
-                        {
-                            Color pixelColor = encryptedImg.GetPixel(x, y);
-                            encryptedImageData[y * width + x] = pixelColor.R; // Gambar grayscale jadi hanya R yang diambil
-                        }
-                    }
-
-                    // Mendekripsi data gambar
-                    byte[] keystream = GenerateKeystream(width * height);
-                    for (int i = 0; i < encryptedImageData.Length; i++)
-                    {
-                        decryptedImageData[i] = (byte)(encryptedImageData[i] ^ keystream[i]);
-
-                        // Update progress bar
-                        progressBarDecryption.Value = i + 1;
-                    }
-
-                    // Simpan gambar terdekripsi
-                    Bitmap decryptedImg = new Bitmap(width, height);
-                    for (int y = 0; y < height; y++)
-                    {
-                        for (int x = 0; x < width; x++)
-                        {
-                            byte pixelValue = decryptedImageData[y * width + x];
-                            decryptedImg.SetPixel(x, y, Color.FromArgb(pixelValue, pixelValue, pixelValue));
-                        }
-                    }
-
-                    // Tampilkan gambar terdekripsi di PictureBox
-                    pictureBoxPlainImage.Image = decryptedImg;
-                    pictureBoxPlainImage.SizeMode = PictureBoxSizeMode.StretchImage;
-
-                    MessageBox.Show("Gambar berhasil didekripsi. Silakan simpan gambar terdekripsi menggunakan tombol 'Save Citra Medis'.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Gagal mendekripsi gambar: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private byte[] GenerateKeystream(int length)
-        {
-            Spritz spritz = new Spritz();
-            spritz.SetKey(spritzKey);
-            return spritz.GenerateKeystream(length);
-        }
-
-        private byte[] DecryptData(byte[] data, byte[] spritzKey)
-        {
-            byte[] decryptedData = new byte[data.Length];
-            for (int i = 0; i < data.Length; i++)
-            {
-                decryptedData[i] = (byte)(data[i] ^ spritzKey[i % spritzKey.Length]);
-            }
-            return decryptedData;
-        }
-
         private void btnLoadPrivateKey_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -247,8 +51,16 @@ namespace WinFormsApp2
 
                 try
                 {
-                    // Tampilkan kunci privat di TextBox
-                    txtPrivateKey.Text = privateKeyPem;
+                    // Validasi format PEM
+                    if (privateKeyPem.Contains("-----BEGIN RSA PRIVATE KEY-----") && privateKeyPem.Contains("-----END RSA PRIVATE KEY-----"))
+                    {
+                        // Tampilkan kunci privat di TextBox
+                        txtPrivateKey.Text = privateKeyPem;
+                    }
+                    else
+                    {
+                        MessageBox.Show("File yang dipilih bukan kunci privat RSA yang valid.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -451,6 +263,196 @@ namespace WinFormsApp2
                 }
             }
         }
-    }
 
+
+        private void buttonChooseImage_Click_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Citra Medis Encrypted",
+                Filter = "File Gambar (*.bmp) | *.bmp",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string filePath = openFileDialog.FileName;
+                textBoxCipherImagePath.Text = filePath;
+                pictureBoxCipherImage.Image = Image.FromFile(filePath);
+                pictureBoxCipherImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+        }
+
+        private void textBoxCipherImagePath_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form5_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buttonUploadKey_Click_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Kunci Spritz Decrypted",
+                Filter = "Binary Files (*.bin)|*.bin",
+                Title = "Select Spritz Key File"
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    spritzKey = File.ReadAllBytes(openFileDialog.FileName);
+                    // Tampilkan kunci di TextBox atau lakukan sesuatu dengan kunci
+                    textBoxSpritzKey.Text = BitConverter.ToString(spritzKey).Replace("-", "");
+                    MessageBox.Show("Kunci Spritz berhasil dimuat.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Gagal memuat kunci Spritz: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void buttonDecrypt_Click(object sender, EventArgs e)
+        {
+            if (spritzKey == null || spritzKey.Length == 0)
+            {
+                MessageBox.Show("Harap muat kunci Spritz terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(textBoxCipherImagePath.Text))
+            {
+                MessageBox.Show("Harap pilih gambar terenkripsi terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string cipherImagePath = textBoxCipherImagePath.Text;
+
+            // Menggunakan Stopwatch untuk mengukur waktu dekripsi
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start(); // Mulai mengukur waktu
+
+            // Dekripsi gambar
+            DecryptImage(cipherImagePath, spritzKey);
+
+            stopwatch.Stop(); // Hentikan pengukuran waktu
+            double elapsedTimeInSeconds = stopwatch.Elapsed.TotalSeconds; // Mengambil waktu dalam detik
+
+            labelDecryptionTime.Text = $"Waktu Dekripsi: {elapsedTimeInSeconds} detik";
+
+        }
+
+        private void DecryptImage(string imagePath, byte[] spritzKey)
+        {
+            try
+            {
+                using (Bitmap encryptedImg = new Bitmap(imagePath))
+                {
+                    int width = encryptedImg.Width;
+                    int height = encryptedImg.Height;
+                    byte[] encryptedImageData = new byte[width * height];
+                    byte[] decryptedImageData = new byte[width * height];
+
+                    // Inisialisasi progress bar
+                    progressBarDecryption.Minimum = 0;
+                    progressBarDecryption.Maximum = height * width;
+                    progressBarDecryption.Value = 0;
+
+                    // Membaca data gambar terenkripsi
+                    for (int y = 0; y < height; y++)
+                    {
+                        for (int x = 0; x < width; x++)
+                        {
+                            Color pixelColor = encryptedImg.GetPixel(x, y);
+                            encryptedImageData[y * width + x] = pixelColor.R; // Gambar grayscale jadi hanya R yang diambil
+                        }
+                    }
+
+                    // Mendekripsi data gambar
+                    byte[] keystream = GenerateKeystream(width * height);
+                    for (int i = 0; i < encryptedImageData.Length; i++)
+                    {
+                        decryptedImageData[i] = (byte)(encryptedImageData[i] ^ keystream[i]);
+
+                        // Update progress bar
+                        progressBarDecryption.Value = i + 1;
+                    }
+
+                    // Simpan gambar terdekripsi
+                    Bitmap decryptedImg = new Bitmap(width, height);
+                    for (int y = 0; y < height; y++)
+                    {
+                        for (int x = 0; x < width; x++)
+                        {
+                            byte pixelValue = decryptedImageData[y * width + x];
+                            decryptedImg.SetPixel(x, y, Color.FromArgb(pixelValue, pixelValue, pixelValue));
+                        }
+                    }
+
+                    // Tampilkan gambar terdekripsi di PictureBox
+                    pictureBoxPlainImage.Image = decryptedImg;
+                    pictureBoxPlainImage.SizeMode = PictureBoxSizeMode.StretchImage;
+
+                    MessageBox.Show("Gambar berhasil didekripsi. Silakan simpan gambar terdekripsi menggunakan tombol 'Save Citra Medis'.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Gagal mendekripsi gambar: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private byte[] GenerateKeystream(int length)
+        {
+            Spritz spritz = new Spritz();
+            spritz.SetKey(spritzKey);
+            return spritz.GenerateKeystream(length);
+        }
+
+        private byte[] DecryptData(byte[] data, byte[] spritzKey)
+        {
+            byte[] decryptedData = new byte[data.Length];
+            for (int i = 0; i < data.Length; i++)
+            {
+                decryptedData[i] = (byte)(data[i] ^ spritzKey[i % spritzKey.Length]);
+            }
+            return decryptedData;
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            // Tentukan PictureBox yang akan disimpan
+            PictureBox pictureBoxToSave = pictureBoxPlainImage; // Atur sesuai dengan PictureBox yang diinginkan
+
+            // Tentukan format file dan filter dialog
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Citra Medis Decrypted",
+                Filter = "JPEG Image (*.jpg;*.jpeg)|*.jpg;*.jpeg",
+                Title = "Simpan Gambar Hasil Dekripsi",
+                FileName = "plain_image_decrypted.jpg" // Nama default file
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    // Simpan gambar dari PictureBox ke file dalam format JPEG
+                    pictureBoxToSave.Image.Save(saveFileDialog.FileName, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    MessageBox.Show("Gambar berhasil disimpan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Gagal menyimpan gambar: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+    }
 }
