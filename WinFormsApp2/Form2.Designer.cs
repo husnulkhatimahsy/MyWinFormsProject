@@ -50,7 +50,6 @@
             label1.Size = new Size(293, 28);
             label1.TabIndex = 0;
             label1.Text = "Informasi Penggunaan Sistem";
-            label1.Click += label1_Click;
             // 
             // button5
             // 
@@ -134,7 +133,6 @@
             Name = "Form2";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Halaman Informasi";
-            Load += Form2_Load;
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
             tabPage2.ResumeLayout(false);

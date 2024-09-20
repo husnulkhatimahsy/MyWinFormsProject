@@ -12,20 +12,9 @@ namespace WinFormsApp2
             // Set AutoScaleMode untuk form ini
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 
-            // Event handlers untuk efek hover pada tombol
-            button1.MouseEnter += Button_MouseEnter;
-            button1.MouseLeave += Button_MouseLeave;
+            // Mengatur efek hover tombol secara lebih efisien
+            SetButtonHoverEffects();
 
-            button2.MouseEnter += Button_MouseEnter;
-            button2.MouseLeave += Button_MouseLeave;
-
-            button3.MouseEnter += Button_MouseEnter;
-            button3.MouseLeave += Button_MouseLeave;
-
-            button4.MouseEnter += Button_MouseEnter;
-            button4.MouseLeave += Button_MouseLeave;
-
-           
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -35,25 +24,52 @@ namespace WinFormsApp2
 
         private void LoadImages()
         {
-            // Pastikan jalur relatif benar berdasarkan lokasi gambar di folder proyek
-            string basePath = AppDomain.CurrentDomain.BaseDirectory;
-            string imagePath1 = Path.Combine(basePath, "Resources", "lock.png");
-            string imagePath2 = Path.Combine(basePath, "Resources", "unlock.png");
-            string imagePath3 = Path.Combine(basePath, "Resources", "information.png");
-            string imagePath4 = Path.Combine(basePath, "Resources", "keysrsa.png");
+            try
+            {
+                // Pastikan jalur relatif benar berdasarkan lokasi gambar di folder proyek
+                string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                string imagePath1 = Path.Combine(basePath, "Resources", "lock.png");
+                string imagePath2 = Path.Combine(basePath, "Resources", "unlock.png");
+                string imagePath3 = Path.Combine(basePath, "Resources", "information.png");
+                string imagePath4 = Path.Combine(basePath, "Resources", "keysrsa.png");
 
-            // Setel gambar ke PictureBox
-            pictureBox1.Image = Image.FromFile(imagePath1);
-            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
+                // Setel gambar ke PictureBox
+                pictureBox1.Image = Image.FromFile(imagePath1);
+                pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
 
-            pictureBox2.Image = Image.FromFile(imagePath2);
-            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
+                pictureBox2.Image = Image.FromFile(imagePath2);
+                pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
 
-            pictureBox3.Image = Image.FromFile(imagePath3);
-            pictureBox3.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
+                pictureBox3.Image = Image.FromFile(imagePath3);
+                pictureBox3.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
 
-            pictureBox4.Image = Image.FromFile(imagePath4);
-            pictureBox4.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
+                pictureBox4.Image = Image.FromFile(imagePath4);
+                pictureBox4.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Terjadi kesalahan saat memuat gambar: " + ex.Message);
+            }
+            
+        }
+
+        private Image LoadImage(string path)
+        {
+            if (!File.Exists(path))
+                throw new FileNotFoundException($"Gambar tidak ditemukan: {path}");
+
+            Image img = Image.FromFile(path);
+            return img;
+        }
+
+        private void SetButtonHoverEffects()
+        {
+            foreach (var button in this.Controls.OfType<Button>())
+            {
+                button.MouseEnter += Button_MouseEnter;
+                button.MouseLeave += Button_MouseLeave;
+            }
         }
 
         private void label1_Click(object sender, EventArgs e)
