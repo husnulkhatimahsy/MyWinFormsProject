@@ -67,7 +67,7 @@ namespace WinFormsApp2
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Citra Medis",
-                Filter = "File Gambar (*.jpg, *.jpeg, *.png, *.tiff) | *.jpg; *.jpeg; *.png; *.tiff",
+                Filter = "File Gambar (*.jpg, *.jpeg) | *.jpg; *.jpeg",
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
