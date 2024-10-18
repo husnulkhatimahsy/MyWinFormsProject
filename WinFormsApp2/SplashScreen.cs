@@ -30,7 +30,7 @@ namespace WinFormsApp2
 
                 // Setel gambar ke PictureBox
                 pictureBox1.Image = Image.FromFile(imagePath1);
-                pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
+                pictureBox1.SizeMode = PictureBoxSizeMode.Zoom; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
             }
             catch (FileNotFoundException ex)
             {

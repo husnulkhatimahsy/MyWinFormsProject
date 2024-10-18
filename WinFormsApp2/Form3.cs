@@ -164,6 +164,7 @@ namespace WinFormsApp2
             }
         }
 
+        /*
         public static AsymmetricCipherKeyPair GetRsaKeyPair(RSAParameters parameters)
         {
             RsaPrivateCrtKeyParameters privateKey = new RsaPrivateCrtKeyParameters(
@@ -183,6 +184,7 @@ namespace WinFormsApp2
 
             return new AsymmetricCipherKeyPair(publicKey, privateKey);
         }
+        */
 
         private BigInteger ByteArrayToPositiveBigInteger(byte[] byteArray)
         {

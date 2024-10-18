@@ -10,6 +10,7 @@ namespace WinFormsApp2
 {
     public partial class Form5 : Form
     {
+        // Deklarasi spritzKey sebagai array byte
         private byte[] spritzKey;
         // Deklarasi variabel decryptedSpritzKey sebagai array byte
         private byte[]? decryptedSpritzKey;
@@ -51,7 +52,7 @@ namespace WinFormsApp2
 
                 try
                 {
-                    // Validasi format PEM
+                    // Validasi format PEM kunci privat
                     if (privateKeyPem.Contains("-----BEGIN RSA PRIVATE KEY-----") && privateKeyPem.Contains("-----END RSA PRIVATE KEY-----"))
                     {
                         // Tampilkan kunci privat di TextBox
@@ -99,7 +100,7 @@ namespace WinFormsApp2
         {
             try
             {
-                // Load the RSA private key from TextBox
+                // Memuat kunci privat RSA dari textBox
                 string privateKeyPem = txtPrivateKey.Text;
 
                 if (string.IsNullOrEmpty(privateKeyPem))
@@ -108,7 +109,7 @@ namespace WinFormsApp2
                     return;
                 }
 
-                // Load the cipherkey (Spritz key) from the TextBox
+                // Memuat cipherkey (Spritz key) dari TextBox
                 byte[] cipherKey;
                 try
                 {
@@ -124,7 +125,7 @@ namespace WinFormsApp2
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start(); // Mulai mengukur waktu
 
-                // Decrypt the Spritz key using RSA
+                // Dekripsi kunci Spritz menggunakan RSA
                 byte[] spritzKey;
                 try
                 {
@@ -139,16 +140,16 @@ namespace WinFormsApp2
                 stopwatch.Stop(); // Hentikan pengukuran waktu
                 double elapsedTimeInSeconds = stopwatch.Elapsed.TotalSeconds; // Mengambil waktu dalam detik
 
-                // Display decryption time
+                // Menampilkan waktu dekripsi
                 lblDecryptionTime2.Text = $"Waktu Dekripsi: {elapsedTimeInSeconds} detik";
 
-                // Update progress bar (set to 100% if decryption is successful)
+                // Update progress bar (diatur ke 100% jika proses dekripsi berhasil)
                 progressBarDecryption2.Value = 100;
 
-                // Store the decrypted Spritz key in a class-level variable for later saving
+                // Menyimpan kunci Spritz yang telah didekripsi untuk digunakan di bagian lain dari program
                 decryptedSpritzKey = spritzKey;
 
-                // Optionally, notify the user that the decryption was successful
+                // Notifikasi bahwa kunci berhasil didekripsi
                 MessageBox.Show("Kunci Spritz berhasil didekripsi.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
@@ -166,14 +167,6 @@ namespace WinFormsApp2
             }
         }
 
-        private byte[] ConvertPemToBytes(string pem)
-        {
-            var pemHeader = "-----BEGIN RSA PRIVATE KEY-----";
-            var pemFooter = "-----END RSA PRIVATE KEY-----";
-
-            var base64 = pem.Replace(pemHeader, "").Replace(pemFooter, "").Replace("\r", "").Replace("\n", "");
-            return Convert.FromBase64String(base64);
-        }
 
         private byte[] ConvertHexStringToByteArray(string hex)
         {
@@ -188,11 +181,8 @@ namespace WinFormsApp2
 
         private RSAParameters ImportPrivateKeyFromPem(string pem)
         {
-            var pemHeader = "-----BEGIN RSA PRIVATE KEY-----";
-            var pemFooter = "-----END RSA PRIVATE KEY-----";
-
-            var base64 = pem.Replace(pemHeader, "").Replace(pemFooter, "").Replace("\r", "").Replace("\n", "");
-            var privateKeyBytes = Convert.FromBase64String(base64);
+            // Menggunakan ConvertPemToBytes untuk mendapatkan byte[] dari PEM
+            byte[] privateKeyBytes = ConvertPemToBytes(pem);
 
             // Decode PKCS#1 private key
             using (var memoryStream = new MemoryStream(privateKeyBytes))
@@ -200,6 +190,15 @@ namespace WinFormsApp2
             {
                 return ReadRSAPrivateKey(reader);
             }
+        }
+
+        private byte[] ConvertPemToBytes(string pem)
+        {
+            var pemHeader = "-----BEGIN RSA PRIVATE KEY-----";
+            var pemFooter = "-----END RSA PRIVATE KEY-----";
+
+            var base64 = pem.Replace(pemHeader, "").Replace(pemFooter, "").Replace("\r", "").Replace("\n", "");
+            return Convert.FromBase64String(base64);
         }
 
         private RSAParameters ReadRSAPrivateKey(BinaryReader reader)
@@ -233,7 +232,6 @@ namespace WinFormsApp2
             return reader.ReadBytes(length);
         }
 
-
         private void btnSaveSpritzKey_Click(object sender, EventArgs e)
         {
             if (decryptedSpritzKey == null || decryptedSpritzKey.Length == 0)
@@ -264,7 +262,6 @@ namespace WinFormsApp2
             }
         }
 
-
         private void buttonChooseImage_Click_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -280,7 +277,7 @@ namespace WinFormsApp2
                 string filePath = openFileDialog.FileName;
                 textBoxCipherImagePath.Text = filePath;
                 pictureBoxCipherImage.Image = Image.FromFile(filePath);
-                pictureBoxCipherImage.SizeMode = PictureBoxSizeMode.StretchImage;
+                pictureBoxCipherImage.SizeMode = PictureBoxSizeMode.Zoom;
             }
         }
 
@@ -308,7 +305,7 @@ namespace WinFormsApp2
                 try
                 {
                     spritzKey = File.ReadAllBytes(openFileDialog.FileName);
-                    // Tampilkan kunci di TextBox atau lakukan sesuatu dengan kunci
+                    // Menampilkan kunci di TextBox 
                     textBoxSpritzKey.Text = BitConverter.ToString(spritzKey).Replace("-", "");
                     MessageBox.Show("Kunci Spritz berhasil dimuat.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -398,7 +395,7 @@ namespace WinFormsApp2
 
                     // Tampilkan gambar terdekripsi di PictureBox
                     pictureBoxPlainImage.Image = decryptedImg;
-                    pictureBoxPlainImage.SizeMode = PictureBoxSizeMode.StretchImage;
+                    pictureBoxPlainImage.SizeMode = PictureBoxSizeMode.Zoom;
 
                     MessageBox.Show("Gambar berhasil didekripsi. Silakan simpan gambar terdekripsi menggunakan tombol 'Save Citra Medis'.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -413,18 +410,9 @@ namespace WinFormsApp2
         {
             Spritz spritz = new Spritz();
             spritz.SetKey(spritzKey);
-            return spritz.GenerateKeystream(length);
+            return spritz.GenerateKeystream(length); // Menghasilkan keystream sepanjang 'length'
         }
 
-        private byte[] DecryptData(byte[] data, byte[] spritzKey)
-        {
-            byte[] decryptedData = new byte[data.Length];
-            for (int i = 0; i < data.Length; i++)
-            {
-                decryptedData[i] = (byte)(data[i] ^ spritzKey[i % spritzKey.Length]);
-            }
-            return decryptedData;
-        }
 
         private void button8_Click(object sender, EventArgs e)
         {

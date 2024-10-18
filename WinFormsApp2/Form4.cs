@@ -34,7 +34,7 @@ namespace WinFormsApp2
 
         private byte[] GenerateSpritzKey(int keyLength)
         {
-            // Buat instance Spritz cipher
+            // Membuat instance Spritz cipher
             Spritz spritz = new Spritz();
 
             // Generate kunci acak 128-bit untuk Spritz
@@ -76,7 +76,6 @@ namespace WinFormsApp2
             {
                 string filePath = openFileDialog.FileName;
 
-                // Coba tampilkan gambar di PictureBox langsung, tanpa validasi bit depth
                 try
                 {
                     // Tampilkan gambar di PictureBox
@@ -150,6 +149,7 @@ namespace WinFormsApp2
             labelEncryptionTime.Text = $"Waktu Enkripsi: {elapsedTimeInSeconds} detik";
         }
 
+        /*
         private byte[] EncryptData(byte[] data, byte[] spritzKey)
         {
             byte[] encryptedData = new byte[data.Length];
@@ -158,7 +158,7 @@ namespace WinFormsApp2
                 encryptedData[i] = (byte)(data[i] ^ spritzKey[i % spritzKey.Length]);
             }
             return encryptedData;
-        }
+        }*/
 
         private void EncryptImage(string imagePath, byte[] spritzKey)
         {
@@ -207,7 +207,7 @@ namespace WinFormsApp2
 
                     // Tampilkan gambar terenkripsi di PictureBox
                     pictureBoxEncrypted.Image = encryptedImg;
-                    pictureBoxEncrypted.SizeMode = PictureBoxSizeMode.StretchImage;
+                    pictureBoxEncrypted.SizeMode = PictureBoxSizeMode.Zoom;
 
                     MessageBox.Show("Gambar berhasil dienkripsi. Silakan simpan gambar terenkripsi menggunakan tombol 'Save Cipher Image'.",
                                 "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
