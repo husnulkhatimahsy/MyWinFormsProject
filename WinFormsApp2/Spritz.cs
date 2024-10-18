@@ -48,7 +48,7 @@ public class Spritz
     private void Update()
     {
         i = (byte)((i + w) % 256);
-        j = (byte)((k + S[(j + S[i]) % 256]) % 256);y
+        j = (byte)((k + S[(j + S[i]) % 256]) % 256);
         k = (byte)((k + i + S[j]) % 256);
         Swap(i, j);
     }
