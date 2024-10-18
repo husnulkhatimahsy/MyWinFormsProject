@@ -2,17 +2,17 @@
 
 public class Spritz
 {
-    private byte i, j, k, z;
-    private byte w;
-    private byte[] S;
+    private byte i, j, k, z;  // Elemen dari algoritma
+    private byte w;            // Elemen untuk kontrol
+    private byte[] S;         // State array
 
     public Spritz()
     {
-        i = j = k = z = 0;
-        w = 1;
-        S = new byte[256];
+        i = j = k = z = 0;     // Inisialisasi elemen
+        w = 1;                 // Kontrol untuk i
+        S = new byte[256];     // State array berukuran 256
         for (int x = 0; x < 256; x++)
-            S[x] = (byte)x;
+            S[x] = (byte)x;    // Inisialisasi array S
     }
 
     private void Swap(int x, int y)
@@ -29,9 +29,9 @@ public class Spritz
         for (int i = 0; i < 256; i++)
         {
             j = (byte)((j + S[i] + key[i % keyLength]) % 256);
-            Swap(i, j);
+            Swap(i, j); // Pertukaran elemen dalam S
         }
-        this.i = this.j = this.k = this.z = 0;
+        this.i = this.j = this.k = this.z = 0;    // Reset state
     }
 
     public byte[] GenerateKeystream(int length)
@@ -39,7 +39,7 @@ public class Spritz
         byte[] keystream = new byte[length];
         for (int m = 0; m < length; m++)
         {
-            Update();
+            Update();   // Memperbarui nilai i, j, k, z
             keystream[m] = S[(j + S[(i + S[(z + k) % 256]) % 256]) % 256];
         }
         return keystream;
@@ -48,7 +48,7 @@ public class Spritz
     private void Update()
     {
         i = (byte)((i + w) % 256);
-        j = (byte)((k + S[(j + S[i]) % 256]) % 256);
+        j = (byte)((k + S[(j + S[i]) % 256]) % 256);y
         k = (byte)((k + i + S[j]) % 256);
         Swap(i, j);
     }

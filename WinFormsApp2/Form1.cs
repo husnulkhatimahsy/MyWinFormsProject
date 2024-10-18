@@ -26,32 +26,24 @@ namespace WinFormsApp2
         {
             try
             {
-                // Pastikan jalur relatif benar berdasarkan lokasi gambar di folder proyek
                 string basePath = AppDomain.CurrentDomain.BaseDirectory;
-                string imagePath1 = Path.Combine(basePath, "Resources", "lock.png");
-                string imagePath2 = Path.Combine(basePath, "Resources", "unlock.png");
-                string imagePath3 = Path.Combine(basePath, "Resources", "information.png");
-                string imagePath4 = Path.Combine(basePath, "Resources", "keysrsa.png");
 
-                // Setel gambar ke PictureBox
-                pictureBox1.Image = Image.FromFile(imagePath1);
-                pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
+                pictureBox1.Image = LoadImage(Path.Combine(basePath, "Resources", "lock.png"));
+                pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
 
-                pictureBox2.Image = Image.FromFile(imagePath2);
-                pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
+                pictureBox2.Image = LoadImage(Path.Combine(basePath, "Resources", "unlock.png"));
+                pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
 
-                pictureBox3.Image = Image.FromFile(imagePath3);
-                pictureBox3.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
+                pictureBox3.Image = LoadImage(Path.Combine(basePath, "Resources", "information.png"));
+                pictureBox3.SizeMode = PictureBoxSizeMode.StretchImage;
 
-                pictureBox4.Image = Image.FromFile(imagePath4);
-                pictureBox4.SizeMode = PictureBoxSizeMode.StretchImage; // Menyesuaikan ukuran gambar dengan ukuran PictureBox
+                pictureBox4.Image = LoadImage(Path.Combine(basePath, "Resources", "keysrsa.png"));
+                pictureBox4.SizeMode = PictureBoxSizeMode.StretchImage;
             }
-
             catch (Exception ex)
             {
                 MessageBox.Show("Terjadi kesalahan saat memuat gambar: " + ex.Message);
             }
-            
         }
 
         private Image LoadImage(string path)
@@ -59,8 +51,7 @@ namespace WinFormsApp2
             if (!File.Exists(path))
                 throw new FileNotFoundException($"Gambar tidak ditemukan: {path}");
 
-            Image img = Image.FromFile(path);
-            return img;
+            return Image.FromFile(path);
         }
 
         private void SetButtonHoverEffects()
@@ -101,24 +92,23 @@ namespace WinFormsApp2
             form5.Show();
         }
 
+        private readonly Color HoverColor = Color.FromArgb(19, 123, 110);
+        private readonly Color DefaultColor = Color.FromArgb(12, 188, 172);
+
         private void Button_MouseEnter(object? sender, EventArgs e)
         {
-            var button = sender as Button;
-            if (button != null)
+            if (sender is Button button)
             {
-                button.BackColor = Color.FromArgb(19, 123, 110);
+                button.BackColor = HoverColor;
             }
-            // Jika button adalah null, tidak ada perubahan yang dilaku
         }
 
         private void Button_MouseLeave(object? sender, EventArgs e)
         {
-            var button = sender as Button;
-            if (button != null)
+            if (sender is Button button)
             {
-                button.BackColor = Color.FromArgb(12, 188, 172);
+                button.BackColor = DefaultColor;
             }
-            // Jika button adalah null, tidak ada perubahan yang dilaku
         }
     }
 }

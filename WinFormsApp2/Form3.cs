@@ -56,8 +56,8 @@ namespace WinFormsApp2
                     textBoxPublicKey.Text = ExportKeyToPEM(publicKey, false);
                     textBoxPrivateKey.Text = ExportKeyToPEM(privateKey, true);
 
-                    // Tampilkan bilangan prima p dan q di TextBox dalam format desimal
-                    // Pastikan privateKey.P dan privateKey.Q tidak null sebelum diproses
+                    // Menampilkan bilangan prima p dan q di TextBox dalam format desimal
+                    // Memastikan privateKey.P dan privateKey.Q tidak null sebelum diproses
                     if (privateKey.P != null)
                     {
                         // Konversi byte array ke BigInteger dan tampilkan di TextBox
@@ -149,7 +149,7 @@ namespace WinFormsApp2
 
                 if (includePrivateParameters)
                 {
-                    // Convert the .NET RSAParameters to BouncyCastle RSA parameters
+                    // Konversi .NET RSAParameters ke BouncyCastle RSA parameters
                     var keyPair = DotNetUtilities.GetRsaKeyPair(key);
                     pemWriter.WriteObject(keyPair.Private);
                 }
