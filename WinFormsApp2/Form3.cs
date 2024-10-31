@@ -18,10 +18,16 @@ namespace WinFormsApp2
     {
         private RSAParameters publicKey;
         private RSAParameters privateKey;
+        private CPUMonitor cpuMonitor; // Inisialisasi CPUMonitor untuk pemantauan CPU
+        ToolTip toolTip = new ToolTip(); // Untuk menambahkan tooltip
 
-        public Form3()
+        private Form1 mainForm;
+
+        public Form3(Form1 parentForm) // Konstruktor menerima referensi Form1
         {
             InitializeComponent();
+            this.mainForm = parentForm;
+            cpuMonitor = new CPUMonitor(); // Inisialisasi CPUMonitor
         }
 
         private void label2_Click(object sender, EventArgs e)
@@ -35,16 +41,28 @@ namespace WinFormsApp2
 
         private void Form3_Load(object sender, EventArgs e)
         {
+            // Cek apakah kunci RSA sudah pernah di-generate
+            if (mainForm.rsaKeyGenerated)
+            {
+                btnGenerate.Enabled = false; // Nonaktifkan tombol Generate
+                btnGenerate.BackColor = Color.Gray; // Ubah warna tombol jadi abu-abu
+                toolTip.SetToolTip(btnGenerate, "Kunci RSA sudah dihasilkan. Tidak bisa generate lagi dalam sesi ini.");
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if (mainForm.rsaKeyGenerated)
+            {
+                MessageBox.Show("Kunci RSA sudah dibangkitkan. Tidak dapat membangkitkan lagi dalam sesi ini.");
+                return;
+            }
+
+            cpuMonitor.StartMonitoring(); // Mulai pemantauan CPU
+
             try
             {
-                // Mulai timer untuk menghitung waktu generate kunci
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-
+           
                 // Generate RSA key pair
                 using (var rsa = new RSACng(2048))
                 {
@@ -81,10 +99,35 @@ namespace WinFormsApp2
                     }
                 }
 
-                // Hentikan timer dan tampilkan waktu generate kunci dalam detik
-                stopwatch.Stop();
-                double elapsedSeconds = stopwatch.ElapsedMilliseconds / 1000.0;
-                GenerateTime.Text = $"Waktu generate kunci RSA: {elapsedSeconds:F2} detik";
+                // Tandai bahwa kunci sudah dibangkitkan
+                mainForm.rsaKeyGenerated = true;
+
+                // Ubah tampilan tombol menjadi tidak aktif
+                btnGenerate.Enabled = false;
+                btnGenerate.BackColor = Color.Gray; // Ubah warna tombol jadi abu-abu
+                toolTip.SetToolTip(btnGenerate, "Kunci RSA sudah dibangkitkan. Tidak bisa membangkitkan lagi dalam sesi ini."); // Tooltip
+                MessageBox.Show("Kunci RSA berhasil dibangkitkan.");
+
+                cpuMonitor.StopMonitoring(); // Hentikan pemantauan CPU
+                
+                // Ambil rata-rata penggunaan CPU selama proses pembangkitan kunci RSA
+                double avgCpuUsage = cpuMonitor.GetAverageCpuUsage();
+
+                // Setelah perhitungan avgCpuUsage selesai
+                string filePath = @"D:\Skripsi\File\Python\Pengujian\HasilPenggunaanCPUPembangkitanKunciRSA.txt";
+
+                try
+                {
+                    using (StreamWriter writer = new StreamWriter(filePath, true))
+                    {
+                        writer.WriteLine($"Penggunaan CPU rata-rata selama pembangkitan kunci RSA: {avgCpuUsage:F2}% pada {DateTime.Now}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error saat menyimpan hasil penggunaan CPU: {ex.Message}");
+                }
+
             }
             catch (Exception ex)
             {

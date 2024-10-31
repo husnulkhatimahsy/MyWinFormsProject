@@ -37,7 +37,6 @@
             button3 = new Button();
             button5 = new Button();
             groupBox1 = new GroupBox();
-            GenerateTime = new Label();
             textBoxPrimaQ = new TextBox();
             textBoxPrimaP = new TextBox();
             label5 = new Label();
@@ -48,7 +47,7 @@
             // label1
             // 
             label1.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label1.Location = new Point(107, 36);
+            label1.Location = new Point(151, 52);
             label1.Name = "label1";
             label1.Size = new Size(757, 58);
             label1.TabIndex = 0;
@@ -61,11 +60,11 @@
             btnGenerate.BackColor = Color.FromArgb(204, 220, 36);
             btnGenerate.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnGenerate.ForeColor = Color.FromArgb(6, 52, 72);
-            btnGenerate.Location = new Point(658, 55);
+            btnGenerate.Location = new Point(346, 265);
             btnGenerate.Name = "btnGenerate";
-            btnGenerate.Size = new Size(197, 77);
+            btnGenerate.Size = new Size(262, 73);
             btnGenerate.TabIndex = 2;
-            btnGenerate.Text = "Generate";
+            btnGenerate.Text = "Generate RSA Keys";
             btnGenerate.UseVisualStyleBackColor = false;
             btnGenerate.Click += button1_Click;
             // 
@@ -73,14 +72,14 @@
             // 
             textBoxPublicKey.Location = new Point(236, 144);
             textBoxPublicKey.Name = "textBoxPublicKey";
-            textBoxPublicKey.Size = new Size(378, 31);
+            textBoxPublicKey.Size = new Size(665, 31);
             textBoxPublicKey.TabIndex = 3;
             // 
             // textBoxPrivateKey
             // 
             textBoxPrivateKey.Location = new Point(236, 190);
             textBoxPrivateKey.Name = "textBoxPrivateKey";
-            textBoxPrivateKey.Size = new Size(378, 31);
+            textBoxPrivateKey.Size = new Size(665, 31);
             textBoxPrivateKey.TabIndex = 4;
             // 
             // label3
@@ -106,9 +105,9 @@
             button3.BackColor = Color.FromArgb(5, 183, 171);
             button3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button3.ForeColor = SystemColors.Control;
-            button3.Location = new Point(658, 148);
+            button3.Location = new Point(639, 265);
             button3.Name = "button3";
-            button3.Size = new Size(197, 73);
+            button3.Size = new Size(262, 73);
             button3.TabIndex = 13;
             button3.Text = "Save Keys";
             button3.UseVisualStyleBackColor = false;
@@ -116,7 +115,7 @@
             // 
             // button5
             // 
-            button5.Location = new Point(796, 503);
+            button5.Location = new Point(892, 606);
             button5.Name = "button5";
             button5.Size = new Size(112, 34);
             button5.TabIndex = 19;
@@ -126,7 +125,6 @@
             // 
             // groupBox1
             // 
-            groupBox1.Controls.Add(GenerateTime);
             groupBox1.Controls.Add(textBoxPrimaQ);
             groupBox1.Controls.Add(textBoxPrimaP);
             groupBox1.Controls.Add(label5);
@@ -138,27 +136,18 @@
             groupBox1.Controls.Add(textBoxPublicKey);
             groupBox1.Controls.Add(btnGenerate);
             groupBox1.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            groupBox1.Location = new Point(53, 126);
+            groupBox1.Location = new Point(53, 145);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(866, 306);
+            groupBox1.Size = new Size(951, 387);
             groupBox1.TabIndex = 20;
             groupBox1.TabStop = false;
             groupBox1.Text = "Generate RSA Keys";
-            // 
-            // GenerateTime
-            // 
-            GenerateTime.AutoSize = true;
-            GenerateTime.Location = new Point(23, 257);
-            GenerateTime.Name = "GenerateTime";
-            GenerateTime.Size = new Size(244, 25);
-            GenerateTime.TabIndex = 18;
-            GenerateTime.Text = "Waktu Generate Kunci RSA: ";
             // 
             // textBoxPrimaQ
             // 
             textBoxPrimaQ.Location = new Point(236, 99);
             textBoxPrimaQ.Name = "textBoxPrimaQ";
-            textBoxPrimaQ.Size = new Size(378, 31);
+            textBoxPrimaQ.Size = new Size(665, 31);
             textBoxPrimaQ.TabIndex = 17;
             textBoxPrimaQ.TextChanged += textBoxPrimaQ_TextChanged;
             // 
@@ -166,7 +155,7 @@
             // 
             textBoxPrimaP.Location = new Point(236, 55);
             textBoxPrimaP.Name = "textBoxPrimaP";
-            textBoxPrimaP.Size = new Size(378, 31);
+            textBoxPrimaP.Size = new Size(665, 31);
             textBoxPrimaP.TabIndex = 16;
             textBoxPrimaP.TextChanged += textBoxPrimaP_TextChanged;
             // 
@@ -193,7 +182,7 @@
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(238, 247, 255);
-            ClientSize = new Size(963, 549);
+            ClientSize = new Size(1038, 669);
             Controls.Add(button5);
             Controls.Add(groupBox1);
             Controls.Add(label1);
@@ -223,6 +212,5 @@
         private TextBox textBoxPrimaP;
         private Label label5;
         private Label label2;
-        private Label GenerateTime;
     }
 }

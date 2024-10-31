@@ -5,6 +5,9 @@ namespace WinFormsApp2
 {
     public partial class Form1 : Form
     {
+        public bool rsaKeyGenerated = false; // Variabel di tingkat Form1
+        private OverallCPUMonitor cpuMonitor;
+
         public Form1()
         {
             InitializeComponent();
@@ -15,11 +18,19 @@ namespace WinFormsApp2
             // Mengatur efek hover tombol secara lebih efisien
             SetButtonHoverEffects();
 
+            cpuMonitor = new OverallCPUMonitor();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             LoadImages();
+            // Mulai monitoring saat aplikasi dimulai
+            cpuMonitor.StartMonitoring();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            cpuMonitor.StopMonitoring();
         }
 
         private void LoadImages()
@@ -76,7 +87,7 @@ namespace WinFormsApp2
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Form3 form3 = new Form3();
+            Form3 form3 = new Form3(this); // Kirim referensi ke Form1
             form3.Show();
         }
 
@@ -110,5 +121,6 @@ namespace WinFormsApp2
                 button.BackColor = DefaultColor;
             }
         }
+
     }
 }

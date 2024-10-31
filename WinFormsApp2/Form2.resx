@@ -120,9 +120,15 @@
   <data name="richTextBox1.Text" xml:space="preserve">
     <value>
  Penyimpanan di Perangkat:
-  - Pengirim bertanggung jawab untuk menyimpan citra medis terenkripsi di perangkat. 
-  - Pengirim memulai dengan memilih file citra medis, membangkitkan kunci simetris Spritz, dan mengenkripsi citra medis. 
-  - Citra medis yang terenkripsi disimpan di perangkat untuk penggunaan lebih lanjut. Tidak perlu mengirimkan citra kepada penerima.
+  - Pengirim bertanggung jawab untuk menyimpan citra medis terenkripsi di perangkat.
+  - Pengirim memulai dengan memilih file citra medis dan membangkitkan kunci simetris Spritz. Setelah itu, citra medis 
+     dienkripsi menggunakan kunci Spritz.
+  - Citra medis yang terenkripsi disimpan di perangkat untuk penggunaan lebih lanjut. Tidak perlu mengirimkan citra kepada 
+     penerima jika hanya untuk penyimpanan lokal.
+ 
+ Catatan: Kunci Spritz yang dihasilkan dapat digunakan untuk mengenkripsi beberapa citra medis selama aplikasi tidak ditutup. 
+ Jika ingin menggunakan kunci Spritz yang berbeda untuk tiap citra, pengguna dapat menekan tombol "Reset Key" sesuai 
+ kebutuhan.
 
  Pengiriman ke Receiver:
   - Pengirim bertanggung jawab untuk mengenkripsi citra medis sebelum mengirimkannya ke penerima. 
@@ -134,12 +140,20 @@
   <data name="richTextBox2.Text" xml:space="preserve">
     <value> 
  Penerima bertanggung jawab untuk menerima dan mendekripsi citra medis. 
-   - Penerima memulai dengan membangkitkan pasangan kunci RSA, terdiri dari kunci publik dan kunci privat. 
-   - Setelah membangkitkan kunci, penerima membagikan kunci publiknya kepada pengirim. 
-   - Kemudian, penerima menerima cipher image dan cipher key dari pengirim melalui media yang aman.
-   - Penerima menggunakan kunci privat RSA untuk mendekripsi cipher key, menghasilkan kunci simetris Spritz 
-      yang digunakan untuk enkripsi citra medis. 
-   - Setelah memperoleh kunci simetris tersebut, penerima melanjutkan dengan mendekripsi cipher image 
-      menggunakan kunci simetris Spritz yang diperoleh, sehingga citra medis asli dapat dipulihkan dan diakses.</value>
+   - Penerima bertanggung jawab untuk menerima dan mendekripsi citra medis.
+   - Penerima membangkitkan pasangan kunci RSA hanya satu kali, yang terdiri dari kunci publik dan kunci privat. Kunci ini akan 
+      disimpan dan digunakan untuk mendekripsi beberapa kunci simetris Spritz yang akan diterima di masa mendatang. Tidak 
+      perlu membangkitkan kunci RSA setiap kali proses enkripsi berlangsung.
+   - Setelah membangkitkan kunci, penerima membagikan kunci publik RSA kepada pengirim untuk digunakan dalam proses 
+      enkripsi kunci Spritz.
+   - Kemudian, penerima menerima cipher image dan cipher key dari pengirim melalui media yang aman. Cipher key adalah kunci 
+      Spritz yang telah dienkripsi menggunakan kunci publik RSA penerima.
+   - Penerima menggunakan kunci privat RSA untuk mendekripsi cipher key, menghasilkan kunci simetris Spritz yang digunakan 
+      untuk enkripsi citra medis.
+   - Setelah memperoleh kunci simetris Spritz, penerima melanjutkan dengan mendekripsi cipher image menggunakan kunci simetris 
+      tersebut, sehingga citra medis asli dapat dipulihkan dan diakses.
+ 
+ Catatan: Kunci RSA hanya perlu dibangkitkan sekali oleh penerima dan dapat digunakan berkali-kali untuk menerima beberapa 
+ kunci Spritz. Selama kunci privat RSA tidak diubah, proses ini dapat berlangsung tanpa perlu membangkitkan kunci baru.</value>
   </data>
 </root>

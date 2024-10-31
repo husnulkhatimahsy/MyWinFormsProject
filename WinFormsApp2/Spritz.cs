@@ -24,6 +24,11 @@ public class Spritz
 
     public void SetKey(byte[] key)
     {
+        if (key == null || key.Length == 0)
+        {
+            throw new ArgumentException("Kunci tidak valid atau kosong.");
+        }
+
         int keyLength = key.Length;
         byte j = 0;
         for (int i = 0; i < 256; i++)
@@ -32,6 +37,9 @@ public class Spritz
             Swap(i, j); // Pertukaran elemen dalam S
         }
         this.i = this.j = this.k = this.z = 0;    // Reset state
+
+        // Debug output untuk memastikan kunci diterima dengan benar
+        Console.WriteLine("Key set: " + BitConverter.ToString(key));
     }
 
     public byte[] GenerateKeystream(int length)
@@ -42,6 +50,10 @@ public class Spritz
             Update();   // Memperbarui nilai i, j, k, z
             keystream[m] = S[(j + S[(i + S[(z + k) % 256]) % 256]) % 256];
         }
+
+        // Tambahkan log untuk memeriksa keystream
+        Console.WriteLine("Keystream generated: " + BitConverter.ToString(keystream));
+
         return keystream;
     }
 

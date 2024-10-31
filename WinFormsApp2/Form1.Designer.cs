@@ -49,9 +49,9 @@
             // 
             label1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label1.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label1.Location = new Point(130, 35);
+            label1.Location = new Point(130, 44);
             label1.Name = "label1";
-            label1.Size = new Size(698, 77);
+            label1.Size = new Size(778, 84);
             label1.TabIndex = 0;
             label1.Text = "Implementasi Hybrid Cryptosystem Menggunakan Algoritma Spritz dan Algoritma RSA dalam Pengamanan Citra Medis";
             label1.TextAlign = ContentAlignment.TopCenter;
@@ -63,9 +63,9 @@
             button1.BackColor = Color.FromArgb(12, 188, 172);
             button1.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button1.ForeColor = Color.White;
-            button1.Location = new Point(729, 348);
+            button1.Location = new Point(768, 413);
             button1.Name = "button1";
-            button1.Size = new Size(143, 82);
+            button1.Size = new Size(204, 82);
             button1.TabIndex = 1;
             button1.Text = "Halaman Informasi";
             button1.UseVisualStyleBackColor = false;
@@ -77,9 +77,9 @@
             button2.BackColor = Color.FromArgb(12, 188, 172);
             button2.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button2.ForeColor = Color.White;
-            button2.Location = new Point(78, 348);
+            button2.Location = new Point(72, 413);
             button2.Name = "button2";
-            button2.Size = new Size(143, 82);
+            button2.Size = new Size(203, 82);
             button2.TabIndex = 2;
             button2.Text = "Pembangkit Kunci RSA";
             button2.UseVisualStyleBackColor = false;
@@ -91,9 +91,9 @@
             button3.BackColor = Color.FromArgb(12, 188, 172);
             button3.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button3.ForeColor = Color.White;
-            button3.Location = new Point(305, 369);
+            button3.Location = new Point(301, 434);
             button3.Name = "button3";
-            button3.Size = new Size(133, 40);
+            button3.Size = new Size(204, 40);
             button3.TabIndex = 3;
             button3.Text = "Enkripsi";
             button3.UseVisualStyleBackColor = false;
@@ -105,9 +105,9 @@
             button4.BackColor = Color.FromArgb(12, 188, 172);
             button4.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             button4.ForeColor = Color.White;
-            button4.Location = new Point(517, 369);
+            button4.Location = new Point(535, 434);
             button4.Name = "button4";
-            button4.Size = new Size(133, 40);
+            button4.Size = new Size(204, 40);
             button4.TabIndex = 4;
             button4.Text = "Dekripsi";
             button4.UseVisualStyleBackColor = false;
@@ -116,36 +116,36 @@
             // pictureBox1
             // 
             pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            pictureBox1.Location = new Point(304, 171);
+            pictureBox1.Location = new Point(313, 186);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(139, 139);
+            pictureBox1.Size = new Size(179, 189);
             pictureBox1.TabIndex = 5;
             pictureBox1.TabStop = false;
             // 
             // pictureBox2
             // 
             pictureBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            pictureBox2.Location = new Point(516, 171);
+            pictureBox2.Location = new Point(548, 186);
             pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(139, 139);
+            pictureBox2.Size = new Size(179, 189);
             pictureBox2.TabIndex = 6;
             pictureBox2.TabStop = false;
             // 
             // pictureBox3
             // 
             pictureBox3.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            pictureBox3.Location = new Point(730, 171);
+            pictureBox3.Location = new Point(781, 186);
             pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(139, 139);
+            pictureBox3.Size = new Size(179, 189);
             pictureBox3.TabIndex = 7;
             pictureBox3.TabStop = false;
             // 
             // pictureBox4
             // 
             pictureBox4.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            pictureBox4.Location = new Point(81, 171);
+            pictureBox4.Location = new Point(85, 186);
             pictureBox4.Name = "pictureBox4";
-            pictureBox4.Size = new Size(139, 139);
+            pictureBox4.Size = new Size(179, 189);
             pictureBox4.TabIndex = 8;
             pictureBox4.TabStop = false;
             // 
@@ -154,7 +154,7 @@
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label2.ForeColor = Color.FromArgb(6, 52, 72);
-            label2.Location = new Point(78, 499);
+            label2.Location = new Point(72, 610);
             label2.Name = "label2";
             label2.Size = new Size(208, 25);
             label2.TabIndex = 9;
@@ -166,7 +166,7 @@
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label3.ForeColor = Color.FromArgb(6, 52, 72);
-            label3.Location = new Point(708, 499);
+            label3.Location = new Point(807, 610);
             label3.Name = "label3";
             label3.Size = new Size(164, 25);
             label3.TabIndex = 10;
@@ -177,7 +177,7 @@
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(238, 247, 255);
-            ClientSize = new Size(958, 544);
+            ClientSize = new Size(1038, 669);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(pictureBox4);

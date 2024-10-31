@@ -44,14 +44,14 @@
             label1.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label1.Location = new Point(111, 20);
             label1.Name = "label1";
-            label1.Size = new Size(731, 77);
+            label1.Size = new Size(811, 142);
             label1.TabIndex = 1;
             label1.Text = "Implementasi Hybrid Cryptosystem Menggunakan Algoritma Spritz dan Algoritma RSA dalam Pengamanan Citra Medis";
             label1.TextAlign = ContentAlignment.TopCenter;
             // 
             // pictureBox1
             // 
-            pictureBox1.Location = new Point(381, 100);
+            pictureBox1.Location = new Point(422, 116);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(194, 200);
             pictureBox1.TabIndex = 2;
@@ -67,7 +67,7 @@
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label2.ForeColor = Color.Black;
-            label2.Location = new Point(334, 319);
+            label2.Location = new Point(381, 336);
             label2.Name = "label2";
             label2.Size = new Size(278, 28);
             label2.TabIndex = 10;
@@ -78,7 +78,7 @@
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label3.ForeColor = Color.Black;
-            label3.Location = new Point(415, 356);
+            label3.Location = new Point(462, 380);
             label3.Name = "label3";
             label3.Size = new Size(116, 28);
             label3.TabIndex = 11;
@@ -88,9 +88,9 @@
             // 
             label4.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label4.Font = new Font("Segoe UI", 11F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label4.Location = new Point(131, 442);
+            label4.Location = new Point(135, 495);
             label4.Name = "label4";
-            label4.Size = new Size(698, 153);
+            label4.Size = new Size(778, 165);
             label4.TabIndex = 12;
             label4.Text = "Program Studi Teknik Informatika\r\nFakultas Teknik\r\nUniversitas Hasanuddin\r\nGowa\r\n2024";
             label4.TextAlign = ContentAlignment.TopCenter;
@@ -100,7 +100,7 @@
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(238, 247, 255);
-            ClientSize = new Size(958, 604);
+            ClientSize = new Size(1038, 669);
             ControlBox = false;
             Controls.Add(label4);
             Controls.Add(label3);

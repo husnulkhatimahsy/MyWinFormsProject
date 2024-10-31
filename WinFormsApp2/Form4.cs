@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace WinFormsApp2
@@ -13,23 +14,28 @@ namespace WinFormsApp2
         private RSA rsa;
         private byte[] spritzKey;
         private byte[] encryptedSpritzKey = Array.Empty<byte>(); // Inisialisasi dengan array kosong
+        private CPUMonitor cpuMonitor;
 
         public Form4()
         {
             InitializeComponent();
             rsa = RSA.Create(); // Inisialisasi RSA
             spritzKey = Array.Empty<byte>(); // Inisialisasi dengan array kosong
+            cpuMonitor = new CPUMonitor(); // Inisialisasi CPUMonitor
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            int panjangKunci = 16; // Panjang kunci dalam byte (128 bit)
-            spritzKey = GenerateSpritzKey(panjangKunci); // Menghasilkan kunci Spritz
+            int panjangKunci = 16;
+            spritzKey = GenerateSpritzKey(panjangKunci);
 
             // Konversi byte array ke format string untuk ditampilkan
             string spritzKeyString = BitConverter.ToString(spritzKey).Replace("-", "");
 
-            textBoxSpritzKey.Text = spritzKeyString; // Tampilkan kunci Spritz di TextBox
+            textBoxSpritzKey.Text = spritzKeyString;
+            // Setelah generate, tombol di-disable
+            button2.Enabled = false;
+            button2.BackColor = Color.Gray; // Ubah warna ke abu-abu
         }
 
         private byte[] GenerateSpritzKey(int keyLength)
@@ -62,6 +68,11 @@ namespace WinFormsApp2
         {
         }
 
+        private void UpdateImageStatus(string status)
+        {
+            labelStatus.Text = $"Status Citra: {status}";
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -84,6 +95,9 @@ namespace WinFormsApp2
 
                     // Tampilkan path gambar di TextBox
                     textBoxImagePath.Text = filePath;
+
+                    // Perbarui status gambar menjadi "Citra Asli"
+                    UpdateImageStatus("Citra Asli");
                 }
                 catch (Exception ex)
                 {
@@ -123,6 +137,7 @@ namespace WinFormsApp2
 
         private void button3_Click(object sender, EventArgs e)
         {
+
             if (spritzKey == null || spritzKey.Length == 0)
             {
                 MessageBox.Show("Harap generate kunci Spritz terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -137,6 +152,9 @@ namespace WinFormsApp2
                 return;
             }
 
+            // Mulai CPU Monitoring
+            cpuMonitor.StartMonitoring();
+
             // Menggunakan Stopwatch untuk mengukur waktu enkripsi
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start(); // Mulai mengukur waktu
@@ -144,9 +162,31 @@ namespace WinFormsApp2
             EncryptImage(imagePath, spritzKey);
 
             stopwatch.Stop(); // Hentikan pengukuran waktu
-            double elapsedTimeInSeconds = stopwatch.Elapsed.TotalSeconds; // Mengambil waktu dalam detik
+            cpuMonitor.StopMonitoring(); // Hentikan CPU Monitoring
 
+            double elapsedTimeInSeconds = stopwatch.Elapsed.TotalSeconds; // Mengambil waktu dalam detik
             labelEncryptionTime.Text = $"Waktu Enkripsi: {elapsedTimeInSeconds} detik";
+
+            // Menampilkan hasil penggunaan CPU rata-rata
+            double avgCpuUsage = cpuMonitor.GetAverageCpuUsage();
+
+            // Setelah perhitungan avgCpuUsage selesai
+            string filePath = @"D:\Skripsi\File\Python\Pengujian\HasilPenggunaanCPUEnkripsiCitra.txt";
+
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(filePath, true))
+                {
+                    writer.WriteLine($"Penggunaan CPU rata-rata selama Enkripsi Citra Medis: {avgCpuUsage:F2}% pada {DateTime.Now}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saat menyimpan hasil penggunaan CPU: {ex.Message}");
+            }
+
+            // Setelah berhasil enkripsi
+            UpdateImageStatus("Citra Terenkripsi");
         }
 
         /*
@@ -336,6 +376,9 @@ namespace WinFormsApp2
                 return;
             }
 
+            // Mulai CPU Monitoring
+            cpuMonitor.StartMonitoring();
+
             // Menggunakan Stopwatch untuk mengukur waktu enkripsi
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start(); // Mulai mengukur waktu
@@ -350,6 +393,30 @@ namespace WinFormsApp2
 
                 // Simulasi pembaruan progress bar
                 progressBarEncryption2.Value = 100;
+
+                // Hentikan CPU Monitoring
+                cpuMonitor.StopMonitoring();
+
+                // Ambil rata-rata penggunaan CPU selama proses enkripsi
+                double avgCpuUsage = cpuMonitor.GetAverageCpuUsage();
+
+                // Setelah perhitungan avgCpuUsage selesai
+                string filePath = @"D:\Skripsi\File\Python\Pengujian\HasilPenggunaanCPUEnkripsiKey.txt";
+
+                try
+                {
+                    using (StreamWriter writer = new StreamWriter(filePath, true))
+                    {
+                        writer.WriteLine($"Penggunaan CPU rata-rata selama enkripsi kunci: {avgCpuUsage:F2}% pada {DateTime.Now}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error saat menyimpan hasil penggunaan CPU: {ex.Message}");
+                }
+
+                // Notifikasi bahwa kunci berhasil didekripsi
+                MessageBox.Show("Kunci Spritz berhasil dienkripsi.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -391,6 +458,24 @@ namespace WinFormsApp2
         private void label1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void groupBox3_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buttonResetKey_Click_1(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Apakah Anda yakin ingin reset kunci Spritz?", "Konfirmasi Reset", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                // Reset key logic
+                spritzKey = Array.Empty<byte>(); // Hapus kunci
+                textBoxSpritzKey.Clear(); // Hapus dari TextBox
+                button2.Enabled = true; // Enable kembali tombol generate
+                button2.BackColor = Color.FromArgb(204, 220, 36); // Ubah warna ke warna semula
+            }
         }
     }
 }
