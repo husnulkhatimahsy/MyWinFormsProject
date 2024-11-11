@@ -10,14 +10,19 @@
 
   <ItemGroup>
     <None Remove="Resources\information.png" />
+    <None Remove="Resources\keys.png" />
     <None Remove="Resources\keysrsa.png" />
     <None Remove="Resources\lock.png" />
     <None Remove="Resources\logounhas.png" />
+    <None Remove="Resources\save.png" />
     <None Remove="Resources\unlock.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Resources\information.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\keys.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\keysrsa.png">
@@ -27,6 +32,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\logounhas.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\save.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\unlock.png">

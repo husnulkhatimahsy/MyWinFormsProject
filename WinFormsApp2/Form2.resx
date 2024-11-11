@@ -117,6 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="richTextBox3.Text" xml:space="preserve">
+    <value>
+ Pengenalan Kunci RSA dan Kunci Spritz
+  1. Kunci RSA: RSA adalah sistem kunci publik dan kunci privat yang digunakan untuk melindungi kunci Spritz. (Kunci ini     
+      dibangkitkan oleh penerima)
+      a. Kunci Publik: Ini bisa dibagikan ke orang lain. Digunakan oleh pengirim untuk mengenkripsi kunci Spritz sebelum 
+          dikirim ke penerima.
+      b. Kunci Privat: Ini bersifat rahasia dan harus disimpan aman oleh penerima. Digunakan oleh penerima untuk membuka 
+          kunci Spritz yang diterima.
+  2. Kunci Spritz: Kunci ini digunakan untuk mengunci atau mengenkripsi gambar medis. Kunci ini bisa berbeda untuk setiap
+      gambar, membuatnya lebih aman. (Kunci ini dibangkitkan oleh pengirim)
+
+ Prinsip Keamanan Kunci
+  1.  Kunci Publik RSA bisa disebar atau dibagikan ke pengirim tanpa risiko, karena hanya kunci ini yang digunakan untuk
+       mengunci.
+  2.  Kunci Privat RSA dan Kunci Spritz harus disimpan dengan aman dan tidak boleh dibagikan ke siapa pun. Jika kunci privat
+       atau kunci Spritz diketahui pihak lain, keamanan data tidak dapat dijamin. 
+
+ Pengiriman Gambar yang Sudah Terenkripsi
+  1.  Sebelum mengirim gambar medis yang sudah dienkripsi, pastikan kunci Spritz yang digunakan untuk mengenkripsi gambar
+       telah dienkripsi menggunakan kunci publik RSA dari penerima.
+  2.  Dengan cara ini, hanya penerima yang memiliki kunci privat RSA yang bisa membuka kunci Spritz dan melihat gambar
+       medis.</value>
+  </data>
+  <data name="richTextBox4.Text" xml:space="preserve">
+    <value>
+ Contoh Skenario Penggunaan dalam Rujukan Medis
+
+ Dokter Pengirim (Dokter Spesialis Radiologi):
+  -  Setelah menerima pasien rujukan, dokter spesialis radiologi melakukan pemeriksaan dan menghasilkan gambar medis (misalnya,
+      CT scan atau MRI).
+  -  Dokter spesialis radiologi mengenkripsi gambar medis menggunakan kunci Spritz agar data tetap aman.
+  -  Dokter spesialis radiologi menggunakan kunci publik RSA milik dokter perujuk (dokter umum atau spesialis lain) untuk
+      mengenkripsi kunci Spritz.
+  -  Dokter spesialis radiologi kemudian mengirim gambar medis yang sudah terenkripsi beserta kunci Spritz yang juga sudah
+      terenkripsi kepada dokter perujuk.
+
+ Dokter Penerima (Dokter Umum atau Dokter Spesialis yang Merujuk):
+  -  Dokter perujuk menerima gambar medis dan kunci Spritz yang sudah dienkripsi dari dokter spesialis radiologi.
+  -  Dokter perujuk menggunakan kunci privat RSA mereka untuk membuka kunci Spritz.
+  -  Setelah membuka kunci Spritz, dokter perujuk dapat membuka dan melihat hasil pemeriksaan gambar medis untuk menentukan
+      langkah selanjutnya dalam perawatan pasien.</value>
+  </data>
   <data name="richTextBox1.Text" xml:space="preserve">
     <value>
  Penyimpanan di Perangkat:

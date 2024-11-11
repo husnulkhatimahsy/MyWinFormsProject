@@ -8,6 +8,11 @@ namespace WinFormsApp2
         public bool rsaKeyGenerated = false; // Variabel di tingkat Form1
         private OverallCPUMonitor cpuMonitor;
 
+        public string PublicKeyText { get; set; } = string.Empty;
+        public string PrivateKeyText { get; set; } = string.Empty;
+        public string PrimaP { get; set; } = string.Empty;
+        public string PrimaQ { get; set; } = string.Empty;
+
         public Form1()
         {
             InitializeComponent();
@@ -121,6 +126,5 @@ namespace WinFormsApp2
                 button.BackColor = DefaultColor;
             }
         }
-
     }
 }

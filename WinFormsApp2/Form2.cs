@@ -22,5 +22,10 @@ namespace WinFormsApp2
         {
 
         }
+
+        private void richTextBox3_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

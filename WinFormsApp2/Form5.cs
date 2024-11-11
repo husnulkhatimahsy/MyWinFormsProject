@@ -512,7 +512,7 @@ namespace WinFormsApp2
             {
                 try
                 {
-                    // Simpan gambar dari PictureBox ke file dalam format JPEG dengan kualitas tertentu
+                    // Simpan gambar dari PictureBox ke file dalam format JPEG dengan kualitas 100
                     SaveImageAsJpegWithCompression((Bitmap)pictureBoxToSave.Image, saveFileDialog.FileName, 100L); // Kualitas JPEG 100
                     MessageBox.Show("Gambar berhasil disimpan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -525,10 +525,9 @@ namespace WinFormsApp2
 
         private void SaveImageAsJpegWithCompression(Bitmap image, string path, long quality)
         {
-            // Cari encoder untuk format JPEG
             ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
 
-            // Gunakan EncoderParameters untuk mengatur kualitas kompresi JPEG
+            //  Menggunakan EncoderParameters untuk mengatur kualitas kompresi JPEG
             System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
             EncoderParameters encoderParams = new EncoderParameters(1);
             EncoderParameter encoderParam = new EncoderParameter(myEncoder, quality); // Kualitas JPEG (0-100)

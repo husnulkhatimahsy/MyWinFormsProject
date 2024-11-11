@@ -36,16 +36,22 @@
             richTextBox1 = new RichTextBox();
             tabPage2 = new TabPage();
             richTextBox2 = new RichTextBox();
+            tabPage3 = new TabPage();
+            richTextBox3 = new RichTextBox();
+            tabPage4 = new TabPage();
+            richTextBox4 = new RichTextBox();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
+            tabPage3.SuspendLayout();
+            tabPage4.SuspendLayout();
             SuspendLayout();
             // 
             // label1
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label1.Location = new Point(358, 32);
+            label1.Location = new Point(367, 24);
             label1.Name = "label1";
             label1.Size = new Size(293, 28);
             label1.TabIndex = 0;
@@ -65,6 +71,8 @@
             // 
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
+            tabControl1.Controls.Add(tabPage3);
+            tabControl1.Controls.Add(tabPage4);
             tabControl1.Location = new Point(39, 77);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
@@ -120,6 +128,50 @@
             richTextBox2.TabIndex = 0;
             richTextBox2.Text = resources.GetString("richTextBox2.Text");
             // 
+            // tabPage3
+            // 
+            tabPage3.Controls.Add(richTextBox3);
+            tabPage3.Location = new Point(4, 34);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Padding = new Padding(3);
+            tabPage3.Size = new Size(957, 493);
+            tabPage3.TabIndex = 2;
+            tabPage3.Text = "Pengenalan Kunci";
+            tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // richTextBox3
+            // 
+            richTextBox3.BackColor = SystemColors.ButtonHighlight;
+            richTextBox3.Font = new Font("Microsoft Himalaya", 13F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            richTextBox3.Location = new Point(1, -1);
+            richTextBox3.Name = "richTextBox3";
+            richTextBox3.ScrollBars = RichTextBoxScrollBars.Vertical;
+            richTextBox3.Size = new Size(956, 491);
+            richTextBox3.TabIndex = 0;
+            richTextBox3.Text = resources.GetString("richTextBox3.Text");
+            richTextBox3.TextChanged += richTextBox3_TextChanged;
+            // 
+            // tabPage4
+            // 
+            tabPage4.Controls.Add(richTextBox4);
+            tabPage4.Location = new Point(4, 34);
+            tabPage4.Name = "tabPage4";
+            tabPage4.Padding = new Padding(3);
+            tabPage4.Size = new Size(957, 493);
+            tabPage4.TabIndex = 3;
+            tabPage4.Text = "Contoh Skenario";
+            tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // richTextBox4
+            // 
+            richTextBox4.BackColor = SystemColors.ButtonHighlight;
+            richTextBox4.Font = new Font("Microsoft Himalaya", 13F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            richTextBox4.Location = new Point(0, 0);
+            richTextBox4.Name = "richTextBox4";
+            richTextBox4.Size = new Size(954, 490);
+            richTextBox4.TabIndex = 0;
+            richTextBox4.Text = resources.GetString("richTextBox4.Text");
+            // 
             // Form2
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -137,6 +189,8 @@
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
             tabPage2.ResumeLayout(false);
+            tabPage3.ResumeLayout(false);
+            tabPage4.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -150,5 +204,9 @@
         private RichTextBox richTextBox1;
         private TabPage tabPage2;
         private RichTextBox richTextBox2;
+        private TabPage tabPage3;
+        private RichTextBox richTextBox3;
+        private TabPage tabPage4;
+        private RichTextBox richTextBox4;
     }
 }

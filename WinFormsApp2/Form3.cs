@@ -19,7 +19,6 @@ namespace WinFormsApp2
         private RSAParameters publicKey;
         private RSAParameters privateKey;
         private CPUMonitor cpuMonitor; // Inisialisasi CPUMonitor untuk pemantauan CPU
-        ToolTip toolTip = new ToolTip(); // Untuk menambahkan tooltip
 
         private Form1 mainForm;
 
@@ -28,6 +27,8 @@ namespace WinFormsApp2
             InitializeComponent();
             this.mainForm = parentForm;
             cpuMonitor = new CPUMonitor(); // Inisialisasi CPUMonitor
+
+            comboBoxKeySize.SelectedIndex = 1; // Set default ke 2048
         }
 
         private void label2_Click(object sender, EventArgs e)
@@ -41,13 +42,50 @@ namespace WinFormsApp2
 
         private void Form3_Load(object sender, EventArgs e)
         {
+            LoadImages(); // Panggil metode untuk memuat gambar
+
             // Cek apakah kunci RSA sudah pernah di-generate
             if (mainForm.rsaKeyGenerated)
             {
                 btnGenerate.Enabled = false; // Nonaktifkan tombol Generate
                 btnGenerate.BackColor = Color.Gray; // Ubah warna tombol jadi abu-abu
-                toolTip.SetToolTip(btnGenerate, "Kunci RSA sudah dihasilkan. Tidak bisa generate lagi dalam sesi ini.");
+
+                // Isi TextBox dengan kunci yang sudah ada
+                textBoxPublicKey.Text = mainForm.PublicKeyText;
+                textBoxPrivateKey.Text = mainForm.PrivateKeyText;
+                textBoxPrimaP.Text = mainForm.PrimaP;
+                textBoxPrimaQ.Text = mainForm.PrimaQ;
             }
+
+            // Set TextBox to ReadOnly to prevent user input
+            textBoxPrimaP.ReadOnly = true;
+            textBoxPrimaQ.ReadOnly = true;
+            textBoxPublicKey.ReadOnly = true;
+            textBoxPrivateKey.ReadOnly = true;
+        }
+
+        private void LoadImages()
+        {
+            try
+            {
+                string basePath = AppDomain.CurrentDomain.BaseDirectory;
+
+                pictureBoxSave.Image = LoadImage(Path.Combine(basePath, "Resources", "save.png"));
+                pictureBoxSave.SizeMode = PictureBoxSizeMode.Zoom;
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Terjadi kesalahan saat memuat gambar: " + ex.Message);
+            }
+        }
+
+        private Image LoadImage(string path)
+        {
+            if (!File.Exists(path))
+                throw new FileNotFoundException($"Gambar tidak ditemukan: {path}");
+
+            return Image.FromFile(path);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -62,11 +100,22 @@ namespace WinFormsApp2
 
             try
             {
-           
-                // Generate RSA key pair
-                using (var rsa = new RSACng(2048))
+                // Pengecekan null sebelum mengambil nilai dari SelectedItem
+                if (comboBoxKeySize.SelectedItem == null)
                 {
-                    rsa.KeySize = 2048;
+                    MessageBox.Show("Silakan pilih panjang kunci terlebih dahulu.");
+                    return;
+                }
+
+                // Ambil item yang dipilih dan ekstrak angka dari teks
+                string selectedKeySizeText = comboBoxKeySize.SelectedItem?.ToString() ?? "[2048 bit]";
+                int keySize = int.Parse(selectedKeySizeText.Split(' ')[0].Trim('[', ']')); // Ekstrak angka dari teks
+
+                // Generate RSA key pair dengan panjang kunci yang dipilih
+                using (var rsa = new RSACng(keySize))
+
+                {
+                    rsa.KeySize = keySize;
                     publicKey = rsa.ExportParameters(false);
                     privateKey = rsa.ExportParameters(true);
 
@@ -99,17 +148,20 @@ namespace WinFormsApp2
                     }
                 }
 
-                // Tandai bahwa kunci sudah dibangkitkan
+                // Menandai bahwa kunci sudah dibangkitkan
                 mainForm.rsaKeyGenerated = true;
+                mainForm.PublicKeyText = textBoxPublicKey.Text;
+                mainForm.PrivateKeyText = textBoxPrivateKey.Text;
+                mainForm.PrimaP = textBoxPrimaP.Text;
+                mainForm.PrimaQ = textBoxPrimaQ.Text;
 
                 // Ubah tampilan tombol menjadi tidak aktif
                 btnGenerate.Enabled = false;
                 btnGenerate.BackColor = Color.Gray; // Ubah warna tombol jadi abu-abu
-                toolTip.SetToolTip(btnGenerate, "Kunci RSA sudah dibangkitkan. Tidak bisa membangkitkan lagi dalam sesi ini."); // Tooltip
                 MessageBox.Show("Kunci RSA berhasil dibangkitkan.");
 
-                cpuMonitor.StopMonitoring(); // Hentikan pemantauan CPU
-                
+                cpuMonitor.StopMonitoring(); // Hentikan pemantauan CPUx
+
                 // Ambil rata-rata penggunaan CPU selama proses pembangkitan kunci RSA
                 double avgCpuUsage = cpuMonitor.GetAverageCpuUsage();
 
@@ -250,6 +302,21 @@ namespace WinFormsApp2
         }
 
         private void textBoxPrimaQ_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label8_Click(object sender, EventArgs e)
         {
 
         }

@@ -155,7 +155,7 @@
             // label1
             // 
             label1.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label1.Location = new Point(106, 18);
+            label1.Location = new Point(136, 20);
             label1.Name = "label1";
             label1.Size = new Size(757, 37);
             label1.TabIndex = 23;
@@ -248,7 +248,7 @@
             groupBox1.Size = new Size(982, 123);
             groupBox1.TabIndex = 54;
             groupBox1.TabStop = false;
-            groupBox1.Text = "Deskripsi Cipher Key";
+            groupBox1.Text = "Dekripsi Cipher Key";
             // 
             // groupBox5
             // 
@@ -318,7 +318,7 @@
             groupBox4.Size = new Size(982, 393);
             groupBox4.TabIndex = 57;
             groupBox4.TabStop = false;
-            groupBox4.Text = "Deskripsi Cipher Image";
+            groupBox4.Text = "Dekripsi Cipher Image";
             groupBox4.Enter += groupBox4_Enter;
             // 
             // buttonResetKey2
