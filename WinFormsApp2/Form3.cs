@@ -259,28 +259,6 @@ namespace WinFormsApp2
             }
         }
 
-        /*
-        public static AsymmetricCipherKeyPair GetRsaKeyPair(RSAParameters parameters)
-        {
-            RsaPrivateCrtKeyParameters privateKey = new RsaPrivateCrtKeyParameters(
-                new Org.BouncyCastle.Math.BigInteger(1, parameters.Modulus),
-                new Org.BouncyCastle.Math.BigInteger(1, parameters.Exponent),
-                new Org.BouncyCastle.Math.BigInteger(1, parameters.D),
-                new Org.BouncyCastle.Math.BigInteger(1, parameters.P),
-                new Org.BouncyCastle.Math.BigInteger(1, parameters.Q),
-                new Org.BouncyCastle.Math.BigInteger(1, parameters.DP),
-                new Org.BouncyCastle.Math.BigInteger(1, parameters.DQ),
-                new Org.BouncyCastle.Math.BigInteger(1, parameters.InverseQ));
-
-            RsaKeyParameters publicKey = new RsaKeyParameters(
-                false,
-                new Org.BouncyCastle.Math.BigInteger(1, parameters.Modulus),
-                new Org.BouncyCastle.Math.BigInteger(1, parameters.Exponent));
-
-            return new AsymmetricCipherKeyPair(publicKey, privateKey);
-        }
-        */
-
         private BigInteger ByteArrayToPositiveBigInteger(byte[] byteArray)
         {
             // Konversi byte array ke BigInteger

@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
@@ -310,22 +311,54 @@ namespace WinFormsApp2
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Citra Medis Encrypted",
-                Filter = "File Gambar (*.bmp) | *.bmp",
-                FilterIndex = 1,
-                RestoreDirectory = true
+                Filter = "Encrypted Files (*.enc)|*.enc",
+                Title = "Pilih File Gambar Terenkripsi (.enc)"
             };
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                string filePath = openFileDialog.FileName;
-                textBoxCipherImagePath.Text = filePath;
-                pictureBoxCipherImage.Image = Image.FromFile(filePath);
-                pictureBoxCipherImage.SizeMode = PictureBoxSizeMode.Zoom;
+                string encryptedFilePath = openFileDialog.FileName;
+                textBoxCipherImagePath.Text = encryptedFilePath;
+                DisplayCipherImage(encryptedFilePath); // Panggil metode untuk menampilkan gambar terenkripsi
 
-                // Perbarui status gambar menjadi "Citra Terenkripsi"
+                // Perbarui status gambar menjadi "Citra hasil dekripsi"
                 UpdateImageStatus("Citra Terenkripsi");
             }
+        }
 
+        private void DisplayCipherImage(string encryptedFilePath)
+        {
+            try
+            {
+                using (FileStream fs = new FileStream(encryptedFilePath, FileMode.Open, FileAccess.Read))
+                using (BinaryReader reader = new BinaryReader(fs))
+                {
+                    int width = reader.ReadInt32(); // Membaca lebar gambar
+                    int height = reader.ReadInt32(); // Membaca tinggi gambar
+
+                    // Membaca data terenkripsi
+                    byte[] encryptedImageData = reader.ReadBytes(width * height);
+
+                    Bitmap cipherImg = new Bitmap(width, height);
+
+                    for (int y = 0; y < height; y++)
+                    {
+                        for (int x = 0; x < width; x++)
+                        {
+                            byte pixelValue = encryptedImageData[y * width + x];
+                            cipherImg.SetPixel(x, y, Color.FromArgb(pixelValue, pixelValue, pixelValue)); // Grayscale
+                        }
+                    }
+
+                    pictureBoxCipherImage.Image = cipherImg;
+                    pictureBoxCipherImage.SizeMode = PictureBoxSizeMode.Zoom;
+                    MessageBox.Show("Gambar terenkripsi berhasil ditampilkan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Gagal menampilkan gambar terenkripsi: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void textBoxCipherImagePath_TextChanged(object sender, EventArgs e)
@@ -384,7 +417,6 @@ namespace WinFormsApp2
 
         private void buttonDecrypt_Click(object sender, EventArgs e)
         {
-
             if (spritzKey == null || spritzKey.Length == 0)
             {
                 MessageBox.Show("Harap muat kunci Spritz terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -433,44 +465,30 @@ namespace WinFormsApp2
             UpdateImageStatus("Citra Didekripsi");
         }
 
-        private void DecryptImage(string imagePath, byte[] spritzKey)
+        private void DecryptImage(string encryptedFilePath, byte[] spritzKey)
         {
             try
             {
-                using (Bitmap encryptedImg = new Bitmap(imagePath))
+                using (FileStream fs = new FileStream(encryptedFilePath, FileMode.Open, FileAccess.Read))
+                using (BinaryReader reader = new BinaryReader(fs))
                 {
-                    int width = encryptedImg.Width;
-                    int height = encryptedImg.Height;
+                    int width = reader.ReadInt32(); // Membaca lebar gambar
+                    int height = reader.ReadInt32(); // Membaca tinggi gambar
 
-                    // Tentukan ukuran array berdasarkan ukuran gambar
-                    byte[] encryptedImageData = new byte[width * height];
+                    byte[] encryptedImageData = reader.ReadBytes(width * height);
                     byte[] decryptedImageData = new byte[width * height];
 
-                    // Inisialisasi progress bar
                     progressBarDecryption.Minimum = 0;
-                    progressBarDecryption.Maximum = height * width;
+                    progressBarDecryption.Maximum = width * height;
                     progressBarDecryption.Value = 0;
 
-                    // Membaca data gambar terenkripsi
-                    for (int y = 0; y < height; y++)
-                    {
-                        for (int x = 0; x < width; x++)
-                        {
-                            Color pixelColor = encryptedImg.GetPixel(x, y);
-                            encryptedImageData[y * width + x] = pixelColor.R; // Gambar grayscale jadi hanya R yang diambil
-                        }
-                    }
-
-                    // Mendekripsi data gambar
                     byte[] keystream = GenerateKeystream(width * height);
                     for (int i = 0; i < encryptedImageData.Length; i++)
                     {
                         decryptedImageData[i] = (byte)(encryptedImageData[i] ^ keystream[i]);
-                        // Update progress bar
                         progressBarDecryption.Value = i + 1;
                     }
 
-                    // Simpan gambar terdekripsi
                     Bitmap decryptedImg = new Bitmap(width, height);
                     for (int y = 0; y < height; y++)
                     {
@@ -481,10 +499,8 @@ namespace WinFormsApp2
                         }
                     }
 
-                    // Tampilkan gambar terdekripsi di PictureBox
                     pictureBoxPlainImage.Image = decryptedImg;
                     pictureBoxPlainImage.SizeMode = PictureBoxSizeMode.Zoom;
-
                     MessageBox.Show("Gambar berhasil didekripsi.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
@@ -496,10 +512,15 @@ namespace WinFormsApp2
 
         private void button8_Click(object sender, EventArgs e)
         {
-            // Tentukan PictureBox yang akan disimpan
-            PictureBox pictureBoxToSave = pictureBoxPlainImage; // Atur sesuai dengan PictureBox yang diinginkan
+            if (pictureBoxPlainImage.Image == null)
+            {
+                MessageBox.Show("Tidak ada gambar hasil dekripsi untuk disimpan. Lakukan proses dekripsi terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-            // Tentukan format file dan filter dialog
+            // Menentukan PictureBox yang akan disimpan
+            PictureBox pictureBoxToSave = pictureBoxPlainImage;
+
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Citra Medis Decrypted",

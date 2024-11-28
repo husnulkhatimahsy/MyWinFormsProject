@@ -204,10 +204,10 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Font = new Font("Segoe UI", 7F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label7.Font = new Font("Segoe UI", 8F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label7.Location = new Point(76, 477);
             label7.Name = "label7";
-            label7.Size = new Size(460, 76);
+            label7.Size = new Size(521, 84);
             label7.TabIndex = 22;
             label7.Text = "Petunjuk:\r\n1. Pilih panjang kunci RSA. \r\n2. Klik 'Generate RSA Keys' untuk membangkitkan kunci publik dan privat.\r\n3. Klik 'Save Keys' untuk menyimpan kunci publik dan kunci privat.";
             label7.Click += label7_Click;

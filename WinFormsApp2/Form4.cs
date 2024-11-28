@@ -14,6 +14,9 @@ namespace WinFormsApp2
         private RSA rsa;
         private byte[] spritzKey;
         private byte[] encryptedSpritzKey = Array.Empty<byte>(); // Inisialisasi dengan array kosong
+        private byte[] encryptedImageData = Array.Empty<byte>();
+        private int imgWidth;
+        private int imgHeight;
         private CPUMonitor cpuMonitor;
 
         public Form4()
@@ -89,15 +92,22 @@ namespace WinFormsApp2
 
                 try
                 {
-                    // Tampilkan gambar di PictureBox
-                    pictureBoxSelectedImage.Image = Image.FromFile(filePath);
-                    pictureBoxSelectedImage.SizeMode = PictureBoxSizeMode.Zoom;
+                    using (Bitmap img = new Bitmap(filePath)) // Mendeklarasikan dan menginisialisasi img
+                    {
+                        // Tampilkan gambar di PictureBox
+                        pictureBoxSelectedImage.Image = new Bitmap(img); // Salin img ke PictureBox
+                        pictureBoxSelectedImage.SizeMode = PictureBoxSizeMode.Zoom;
 
-                    // Tampilkan path gambar di TextBox
-                    textBoxImagePath.Text = filePath;
+                        // Tampilkan path gambar di TextBox
+                        textBoxImagePath.Text = filePath;
 
-                    // Perbarui status gambar menjadi "Citra Asli"
-                    UpdateImageStatus("Citra Asli");
+                        // Tetapkan nilai imgWidth dan imgHeight
+                        imgWidth = img.Width;
+                        imgHeight = img.Height;
+
+                        // Perbarui status gambar menjadi "Citra Asli"
+                        UpdateImageStatus("Citra Asli");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -187,6 +197,10 @@ namespace WinFormsApp2
 
             // Setelah berhasil enkripsi
             UpdateImageStatus("Citra Terenkripsi");
+
+            // Setelah enkripsi selesai, hitung dan simpan entropi
+            double entropy = CalculateEntropy(encryptedImageData);
+            SaveEntropyToFile(entropy);
         }
 
         /*
@@ -209,20 +223,19 @@ namespace WinFormsApp2
                     int width = img.Width;
                     int height = img.Height;
                     byte[] imageData = new byte[width * height];
-                    byte[] encryptedImageData = new byte[width * height];
+                    encryptedImageData = new byte[width * height];
 
-                    // Inisialisasi progress bar
                     progressBarEncryption.Minimum = 0;
                     progressBarEncryption.Maximum = height * width;
                     progressBarEncryption.Value = 0;
 
-                    // Membaca data gambar
+                    // Membaca data gambar asli
                     for (int y = 0; y < height; y++)
                     {
                         for (int x = 0; x < width; x++)
                         {
                             Color pixelColor = img.GetPixel(x, y);
-                            imageData[y * width + x] = pixelColor.R; // Gambar grayscale jadi hanya R yang diambil
+                            imageData[y * width + x] = pixelColor.R; // Gambar grayscale jadi hanya channel R yang digunakan
                         }
                     }
 
@@ -231,17 +244,17 @@ namespace WinFormsApp2
                     for (int i = 0; i < imageData.Length; i++)
                     {
                         encryptedImageData[i] = (byte)(imageData[i] ^ keystream[i]);
-                        progressBarEncryption.Value = i + 1; // Update progress bar
+                        progressBarEncryption.Value = i + 1;
                     }
 
-                    // Simpan gambar terenkripsi
+                    // Membuat gambar terenkripsi dari data terenkripsi
                     Bitmap encryptedImg = new Bitmap(width, height);
                     for (int y = 0; y < height; y++)
                     {
                         for (int x = 0; x < width; x++)
                         {
                             byte pixelValue = encryptedImageData[y * width + x];
-                            encryptedImg.SetPixel(x, y, Color.FromArgb(pixelValue, pixelValue, pixelValue));
+                            encryptedImg.SetPixel(x, y, Color.FromArgb(pixelValue, pixelValue, pixelValue)); // Gambar grayscale
                         }
                     }
 
@@ -249,8 +262,7 @@ namespace WinFormsApp2
                     pictureBoxEncrypted.Image = encryptedImg;
                     pictureBoxEncrypted.SizeMode = PictureBoxSizeMode.Zoom;
 
-                    MessageBox.Show("Gambar berhasil dienkripsi. Silakan simpan gambar terenkripsi menggunakan tombol 'Save Cipher Image'.",
-                                "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Gambar berhasil dienkripsi dan ditampilkan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
@@ -266,34 +278,87 @@ namespace WinFormsApp2
             return spritz.GenerateKeystream(length);
         }
 
+        private double CalculateEntropy(byte[] data)
+        {
+            int[] frequency = new int[256];
+
+            // Menghitung frekuensi setiap nilai byte (0-255)
+            foreach (var b in data)
+            {
+                frequency[b]++;
+            }
+
+            double entropy = 0.0;
+            int dataSize = data.Length;
+
+            // Menghitung entropi berdasarkan frekuensi
+            foreach (var count in frequency)
+            {
+                if (count == 0) continue; // Lewati nilai byte yang tidak ada
+                double probability = (double)count / dataSize;
+                entropy -= probability * Math.Log2(probability);
+            }
+
+            return entropy;
+        }
+
+        private void SaveEntropyToFile(double entropy)
+        {
+            string filePath = @"D:\Skripsi\File\Python\Pengujian\entropi.txt";
+            string content = $"Entropi: {entropy:F4} pada {DateTime.Now}\n"; // Menampilkan 4 angka di belakang koma
+
+            try
+            {
+                // Tulis entropi ke file dalam mode append
+                File.AppendAllText(filePath, content);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Gagal menyimpan nilai entropi: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void button8_Click(object sender, EventArgs e)
         {
-            if (pictureBoxEncrypted.Image == null)
+            if (encryptedImageData == null || encryptedImageData.Length == 0)
             {
-                MessageBox.Show("Tidak ada gambar terenkripsi untuk disimpan.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Tidak ada data terenkripsi untuk disimpan.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = @"D:\Skripsi\File\Python\Pengujian\Citra Medis Encrypted",
-                Filter = "Bitmap Image (*.bmp)|*.bmp",
-                FilterIndex = 1,
-                RestoreDirectory = true,
-                FileName = "encrypt_image.bmp" // Nama default file
+                Filter = "Encrypted Files (*.enc)|*.enc",
+                FileName = "encrypted_image.enc",
+                Title = "Simpan Gambar Terenkripsi"
             };
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    string filePath = saveFileDialog.FileName;
-                    pictureBoxEncrypted.Image.Save(filePath);
-                    MessageBox.Show($"Gambar berhasil disimpan sebagai {filePath}.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    using (var fs = new FileStream(saveFileDialog.FileName, FileMode.Create, FileAccess.Write))
+                    using (var writer = new BinaryWriter(fs))
+                    {
+                        // Pastikan ukuran data terenkripsi sesuai dengan dimensi gambar
+                        if (encryptedImageData.Length != imgWidth * imgHeight)
+                        {
+                            MessageBox.Show("Data gambar terenkripsi tidak sesuai dengan ukuran lebar dan tinggi gambar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // Tulis metadata lebar dan tinggi gambar
+                        writer.Write(imgWidth);  // Lebar gambar
+                        writer.Write(imgHeight); // Tinggi gambar
+                        writer.Write(encryptedImageData); // Data gambar terenkripsi
+                    }
+
+                    MessageBox.Show($"Data terenkripsi berhasil disimpan sebagai {saveFileDialog.FileName}.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Gagal menyimpan gambar: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Gagal menyimpan data terenkripsi: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -325,6 +390,8 @@ namespace WinFormsApp2
 
                     // Mengimpor kunci publik dengan format X.509
                     rsa.ImportSubjectPublicKeyInfo(rsaPublicKeyBytes, out _);
+
+                    // Menampilkan kunci publik di TextBox
                     textBoxRsaPublicKey.Text = rsaPublicKeyPem; // Tampilkan di TextBox
                 }
                 catch (Exception ex)
